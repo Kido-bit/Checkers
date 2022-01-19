@@ -20,7 +20,6 @@ import java.util.Map;
 public abstract class Piece {
 
     public boolean white;
-    private boolean killed;
     private String pieceIcon;
 
     public String getPieceIcon() {
@@ -122,7 +121,7 @@ public abstract class Piece {
         return new ArrayList<>();
     }
 
-    public Map<String, String> possibleKills(Board board, Player player, int startX, int startY) throws Exception {
+    public Map<String, String> possibleKills(Game game) throws Exception {
         return new HashMap<>();
     }
 }

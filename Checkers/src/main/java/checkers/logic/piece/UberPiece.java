@@ -180,7 +180,7 @@ public class UberPiece extends Piece {
 
     @Override
     public boolean hasKill(Game game) throws Exception {
-        return !possibleKills(game.board, game.currentPlayer, game.startX, game.startY).isEmpty();
+        return !possibleKills(game).isEmpty();
     }
 
     @Override
