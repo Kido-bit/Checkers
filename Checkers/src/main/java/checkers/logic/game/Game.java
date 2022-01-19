@@ -109,15 +109,6 @@ public class Game {
 
     public void initializeContinue(List<Player> players) throws Exception {
 
-        String startInput;
-        String endInput;
-        String startSpotXY;
-        String endSpotXY;
-        int startX;
-        int startY;
-        int endX;
-        int endY;
-
         List<MoveEntity> all = moveDao.getAll();
         List<Move> moves = all.stream()
                 .map(Move::new)
@@ -136,17 +127,18 @@ public class Game {
         }
 
         for (Move move : moves) {
-            startInput = move.getStart();
-            startSpotXY = convertPlayerInput(startInput);
-            startX = Integer.parseInt(String.valueOf(startSpotXY.charAt(0)));
-            startY = Integer.parseInt(String.valueOf(startSpotXY.charAt(1))) - 1;
+            String startInput = move.getStart();
+            String startSpotXY = convertPlayerInput(startInput);
+            int startX = Integer.parseInt(String.valueOf(startSpotXY.charAt(0)));
+            int startY = Integer.parseInt(String.valueOf(startSpotXY.charAt(1))) - 1;
 
-            endInput = move.getEnd();
-            endSpotXY = convertPlayerInput(endInput);
-            endX = Integer.parseInt(String.valueOf(endSpotXY.charAt(0)));
-            endY = Integer.parseInt(String.valueOf(endSpotXY.charAt(1))) - 1;
+            String endInput = move.getEnd();
+            String endSpotXY = convertPlayerInput(endInput);
+            int endX = Integer.parseInt(String.valueOf(endSpotXY.charAt(0)));
+            int endY = Integer.parseInt(String.valueOf(endSpotXY.charAt(1))) - 1;
 
-            if (board.getBoardSpot(endX, endY).isEndSpotValid(board, currentPlayer, startX, startY, endX, endY)) {
+            board.getBoardSpot(endX, endY);
+            if (Spot.isEndSpotValid(board, currentPlayer, startX, startY, endX, endY)) {
                 board.setSpotsAfterMove(startX, startY, endX, endY);
                 board.advancePiece(endX, endY, currentPlayer);
             } else if (board.getPiece(startX, startY).hasKill(board, currentPlayer, startX, startY)) {
@@ -196,61 +188,54 @@ public class Game {
         return String.valueOf(charX - 97) + charY;
     }
 
-    public List<Integer> getStartCheckerXY() throws Exception {
-        List<Integer> startXY = new ArrayList<>();
+    public List<Integer> getSpot(boolean isStartSpot) throws Exception {
+        List<Integer> spotXY = new ArrayList<>();
+        String stringSpotXY;
         boolean isSpotValid;
         do {
-            System.out.println("Which checker to move?");
-            startSpot = getPlayerInput();
-            String startSpotXY = convertPlayerInput(startSpot);
-            int startX = Integer.parseInt(String.valueOf(startSpotXY.charAt(0)));
-            int startY = Integer.parseInt(String.valueOf(startSpotXY.charAt(1))) - 1;
-            startXY.add(startX);
-            startXY.add(startY);
-            isSpotValid = Spot.validateStartSpot(board, currentPlayer, startX, startY);
+            if (isStartSpot) {
+                System.out.println("Which checker to move?");
+                startSpot = getPlayerInput();
+                stringSpotXY = convertPlayerInput(startSpot);
+            } else {
+                System.out.println("Where to go?");
+                endSpot = getPlayerInput();
+                stringSpotXY = convertPlayerInput(endSpot);
+            }
+            int spotX = Integer.parseInt(String.valueOf(stringSpotXY.charAt(0)));
+            int spotY = Integer.parseInt(String.valueOf(stringSpotXY.charAt(1))) - 1;
+            spotXY.add(spotX);
+            spotXY.add(spotY);
+            if (isStartSpot) {
+                isSpotValid = Spot.validateStartSpot(board, currentPlayer, spotX, spotY);
+            } else {
+                isSpotValid = Spot.validateEndSpot(board, spotX, spotY);
+            }
         } while (!isSpotValid);
-        return startXY;
-    }
-
-    public List<Integer> getEndSpotXY() {
-        List<Integer> endXY = new ArrayList<>();
-        System.out.println("Where to go?");
-        endSpot = getPlayerInput();
-        String endSpotXY = convertPlayerInput(endSpot);
-        int endX = Integer.parseInt(String.valueOf(endSpotXY.charAt(0)));
-        int endY = Integer.parseInt(String.valueOf(endSpotXY.charAt(1))) - 1;
-        endXY.add(endX);
-        endXY.add(endY);
-        return endXY;
+        return spotXY;
     }
 
     public void makeMove() throws Exception {
 
         System.out.println(currentPlayer.getName() + " move.");
-
-        int endX;
-        int endY;
-
         // Choosing checker to move
-        List<Integer> startCheckerXY = getStartCheckerXY();
+        List<Integer> startCheckerXY = getSpot(true);
         int startX = startCheckerXY.get(0);
         int startY = startCheckerXY.get(1);
-
         // Choosing where to move
         while (true) {
-            List<Integer> endSpotXY = getEndSpotXY();
-            endX = endSpotXY.get(0);
-            endY = endSpotXY.get(1);
+            List<Integer> endSpotXY = getSpot(false);
+            int endX = endSpotXY.get(0);
+            int endY = endSpotXY.get(1);
             // Making move
-            if (board.isEmpty(endX, endY)) {
-                System.out.println("Invalid board spot!");
-            } else if (board.getBoardSpot(endX, endY).isEndSpotValid(board, currentPlayer, startX, startY, endX, endY)) {
+            if (Spot.isEndSpotValid(board, currentPlayer, startX, startY, endX, endY)) {
                 board.setSpotsAfterMove(startX, startY, endX, endY);
                 moveCounter += 1;
                 board.advancePiece(endX, endY, currentPlayer);
                 moveDao.add(new MoveEntity(moveCounter, currentPlayer.getName(), startSpot, endSpot, currentPlayer.isWhite()));
                 getBoard().printBoard();
                 break;
+                // Making kill
             } else if (board.getPiece(startX, startY).hasKill(board, currentPlayer, startX, startY)) {
                 if (board.getPiece(startX, startY).killEnemyPiece(board, currentPlayer, startX, startY, endX, endY)) {
                     currentPlayer.killCounter();
@@ -267,10 +252,12 @@ public class Game {
                     } else {
                         break;
                     }
+                } else {
+                    System.out.println("Invalid Spot!");
                 }
             }
         }
-        if (currentPlayer.kills == 1) {
+        if (currentPlayer.kills == 12) {
             status = GameStatus.END;
         }
         currentPlayer = currentPlayer.switchPlayers(currentPlayer, players);

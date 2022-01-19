@@ -17,18 +17,29 @@ public class Spot {
     private int y;
     private Piece piece;
 
-    public static boolean validateStartSpot(Board board, Player currentPlayer, int startX, int startY) throws Exception {
+    public static boolean validateStartSpot(Board board, Player player, int startX, int startY) throws Exception {
         if (board.isEmpty(startX, startY)) {
             System.out.println("Invalid board spot!");
         } else if (board.hasNoPiece(startX, startY)) {
             System.out.println("No checker here!");
-        } else if ((currentPlayer.isWhite() && board.pieceIsBlack(startX, startY)) || (currentPlayer.isBlack()) && board.pieceIsWhite(startX, startY)){
+        } else if ((player.isWhite() && board.pieceIsBlack(startX, startY)) || (player.isBlack()) && board.pieceIsWhite(startX, startY)){
             System.out.println("Not your checker!");
-        } else return board.getPiece(startX, startY).hasMove(board, currentPlayer, startX, startY);
+        } else return board.getPiece(startX, startY).hasMove(board, player, startX, startY);
         return false;
     }
 
-    public boolean checkPrimaryMove(Player player, int startX, int startY, int endX, int endY) {
+    public static boolean validateEndSpot(Board board, int endX, int endY) throws Exception {
+        if (board.isEmpty(endX, endY)) {
+            System.out.println("Invalid board spot!");
+            return false;
+        } else if (board.hasPiece(endX, endY)) {
+            System.out.println("Checker on spot!");
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean checkPrimaryMove(Player player, int startX, int startY, int endX, int endY) {
         if ((player.isWhite() && (startY - endY) != -1) ||
                 (player.isBlack() && (startY - endY != 1)) ||
                 (startX - endX != -1 && startX - endX != 1)) {
@@ -44,11 +55,11 @@ public class Spot {
         } else {
             if(piece.hasMove(board, player, startX, startY)){
                 return true;
-            } else return piece.hasKill(board, player, startX, startY);
+            } else return board.getPiece(startX, startY).hasKill(board, player, startX, startY);
         }
     }
 
-    public boolean isEndSpotValid(Board board, Player player, int startX, int startY, int endX, int endY) throws Exception {
+    public static boolean isEndSpotValid(Board board, Player player, int startX, int startY, int endX, int endY) throws Exception {
         if (board.hasPiece(endX, endY)) {
             System.out.println("Invalid move!");
             return false;
