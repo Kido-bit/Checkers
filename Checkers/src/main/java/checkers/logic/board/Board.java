@@ -3,7 +3,11 @@ package checkers.logic.board;
 import checkers.logic.game.Game;
 import checkers.logic.piece.Piece;
 import checkers.logic.player.Player;
-
+import lombok.*;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Board {
 
     private final static int BOARD_SIDE_SIZE = 8;
@@ -48,6 +52,10 @@ public class Board {
     public void setSpotsAfterMove(Game game) {
         setEndBoardSpot(game.startX, game.startY, game.endX, game.endY);
         setBoardPieceNull(game.startX, game.startY);
+    }
+
+    public void setBoardSpot(int x, int y, Spot spotFactory) {
+        boardSpots[x][y] = spotFactory;
     }
 
     public void printBoard() {

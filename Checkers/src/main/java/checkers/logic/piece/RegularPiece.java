@@ -1,6 +1,7 @@
 package checkers.logic.piece;
 
 import checkers.logic.board.Board;
+import checkers.logic.board.SpotFactory;
 import checkers.logic.game.Game;
 import checkers.logic.player.Player;
 import lombok.AllArgsConstructor;
@@ -35,40 +36,35 @@ public class RegularPiece extends Piece {
     }
 
     @Override
+    public void advancePiece(Game game) throws Exception {
+        Board board = game.board;
+        int x = game.endX;
+        int y = game.endY;
+        Player player = game.currentPlayer;
+        if (board.getPiece(x, y).isRegular()) {
+            if (y == 7 && player.isWhite()) {
+                board.setBoardSpot(x, y, SpotFactory.uberWhite(x, y));
+            } else if (y == 0 && player.isBlack()) {
+                board.setBoardSpot(x, y, SpotFactory.uberBlack(x, y));
+            }
+        }
+    }
+
+    @Override
     public boolean hasMove(Game game) throws Exception {
         Board board = game.board;
         Player player = game.currentPlayer;
         int startX = game.startX;
         int startY = game.startY;
         if (player.isWhite()) {
-            if (startY == 7) {
-                if (hasKill(game)) {
-                    return true;
-                } else {
-                    System.out.println("No move available!");
-                }
-            } else if (startX == 0 && board.hasPiece(startX + 1, startY + 1)) {
-                if (hasKill(game)) {
-                    return true;
-                } else {
-                    System.out.println("No move available!");
-                }
-            } else if (startX == 7 && (board.hasPiece(startX - 1, startY + 1))) {
-                if (hasKill(game)) {
-                    return true;
-                } else {
-                    System.out.println("No move available!");
-                }
-            } else if (startX == 7 && (board.hasNoPiece(startX - 1, startY + 1))) {
+            if (validateTopKilling(game)) {
                 return true;
-            } else if (
-                    board.hasPiece(startX + 1, startY + 1) &&
-                            board.hasPiece(startX - 1, startY + 1)) {
-                if (hasKill(game)) {
-                    return true;
-                } else {
-                    System.out.println("No move available!");
-                }
+            } else if (validateLeftMoves(game)) {
+                return true;
+            } else if (validateRightMoves(game)) {
+                return true;
+            } else if (validateCenterMoves(game)) {
+                return true;
             } else {
                 return true;
             }

@@ -38,8 +38,11 @@ public abstract class Piece {
         return false;
     }
 
+    public void advancePiece(Game game) throws Exception {
+    }
+
     public boolean upLeftMove(Board board, int startX, int startY) throws Exception {
-        return  (board.hasNoPiece(startX - 1, startY + 1));
+        return (board.hasNoPiece(startX - 1, startY + 1));
     }
 
     public boolean upRightMove(Board board, int startX, int startY) throws Exception {
@@ -51,25 +54,66 @@ public abstract class Piece {
     }
 
     public boolean downRightMove(Board board, int startX, int startY) throws Exception {
-        return  (board.hasNoPiece(startX + 1, startY - 1));
+        return (board.hasNoPiece(startX + 1, startY - 1));
     }
 
     public boolean validateExceptionsMoves(Board board, int startX, int startY) {
         return false;
     }
-    public boolean validateCenterMoves(Board board, int startX, int startY) {
+
+    public boolean validateCenterMoves(Game game) throws Exception {
+        Board board = game.board;
+        int startX = game.startX;
+        int startY = game.startY;
+        if (board.hasPiece(startX + 1, startY + 1) && board.hasPiece(startX - 1, startY + 1)) {
+            if (hasKill(game)) {
+                return true;
+            } else {
+                System.out.println("No move available!");
+            }
+        }
+            return false;
+    }
+
+    public boolean validateLeftMoves(Game game) throws Exception {
+        Board board = game.board;
+        int startX = game.startX;
+        int startY = game.startY;
+        if (startX == 0 && board.hasNoPiece(startX + 1, startY + 1)) {
+            return true;
+        }
+        if (startX == 0 && board.hasPiece(startX + 1, startY + 1)) {
+            if (hasKill(game)) {
+                return true;
+            } else {
+                System.out.println("No move available!");
+            }
+        }
         return false;
     }
-    public boolean validateLeftMoves(Board board, int startX, int startY) {
+
+    public boolean validateRightMoves(Game game) throws Exception {
+        Board board = game.board;
+        int startX = game.startX;
+        int startY = game.startY;
+        if (startX == 7 && (board.hasNoPiece(startX - 1, startY + 1))) {
+            return true;
+        }
+        if (startX == 7 && board.hasPiece(startX - 1, startY + 1)) {
+            if (hasKill(game)) {
+                return true;
+            } else {
+                System.out.println("No move available!");
+            }
+        }
         return false;
     }
-    public boolean validateRightMoves(Board board, int startX, int startY) {
-        return false;
-    }
+
     public boolean validateTopMoves(Board board, int startX, int startY) {
         return false;
     }
-    public boolean validateBottomMoves(Board board, int startX, int startY) {
+
+    public boolean validateBottomMoves(Game game) throws Exception {
         return false;
     }
 
@@ -117,7 +161,7 @@ public abstract class Piece {
         return false;
     }
 
-    public List<String> possiblePrimaryMoves(Game game) throws Exception{
+    public List<String> possiblePrimaryMoves(Game game) throws Exception {
         return new ArrayList<>();
     }
 

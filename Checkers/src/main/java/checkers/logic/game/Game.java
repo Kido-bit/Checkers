@@ -237,7 +237,7 @@ public class Game {
             // Making move
             if (Spot.isEndSpotValid(this)) {
                 board.setSpotsAfterMove(this);
-                board.advancePiece(this);
+                board.getPiece(endX, endY).advancePiece(this);
                 moveDao.add(new MoveEntity(this));
                 getBoard().printBoard();
                 break;
@@ -246,7 +246,7 @@ public class Game {
                 if (board.getStartPiece(this).killEnemyPiece(this)) {
                     currentPlayer.killCounter();
                     board.setSpotsAfterMove(this);
-                    board.advancePiece(this);
+                    board.getPiece(endX, endY).advancePiece(this);
                     getBoard().printBoard();
                     startX = endX;
                     startY = endY;
@@ -270,9 +270,6 @@ public class Game {
     }
 
     public boolean isActive() {
-        if (status == GameStatus.END) {
-            return false;
-        }
-        return true;
+        return status != GameStatus.END;
     }
 }
