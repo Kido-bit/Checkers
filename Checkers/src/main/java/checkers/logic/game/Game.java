@@ -32,13 +32,18 @@ public class Game {
     private Player currentPlayer;
     private GameStatus status;
     private int moveCounter = 0;
-    private List<Move> movesPlayed;
     private static Scanner scanner = new Scanner(System.in);
     private HibernateFactory hibernateFactory = new HibernateFactory();
     private PlayerDao playerDao = new PlayerDao(hibernateFactory);
     private MoveDao moveDao = new MoveDao(hibernateFactory);
     private String startSpot;
     private String endSpot;
+    public int spotX;
+    public int spotY;
+    public int startX;
+    public int startY;
+    public int endX;
+    public int endY;
 
 
     public void runGame() throws Exception {
@@ -104,7 +109,6 @@ public class Game {
             currentPlayer = player2;
         }
 
-        movesPlayed = new ArrayList<>();
     }
 
     public void initializeContinue(List<Player> players) throws Exception {
@@ -188,8 +192,12 @@ public class Game {
         return String.valueOf(charX - 97) + charY;
     }
 
-    public List<Integer> getSpot(boolean isStartSpot) throws Exception {
-        List<Integer> spotXY = new ArrayList<>();
+    private void parseInputXY(String input) {
+        spotX = Integer.parseInt(String.valueOf(input.charAt(0)));
+        spotY = Integer.parseInt(String.valueOf(input.charAt(1))) - 1;
+    }
+
+    public void getSpot(boolean isStartSpot) throws Exception {
         String stringSpotXY;
         boolean isSpotValid;
         do {
@@ -197,36 +205,33 @@ public class Game {
                 System.out.println("Which checker to move?");
                 startSpot = getPlayerInput();
                 stringSpotXY = convertPlayerInput(startSpot);
+                parseInputXY(stringSpotXY);
+                startX = spotX;
+                startY = spotY;
             } else {
                 System.out.println("Where to go?");
                 endSpot = getPlayerInput();
                 stringSpotXY = convertPlayerInput(endSpot);
+                parseInputXY(stringSpotXY);
+                endX = spotX;
+                endY = spotY;
             }
-            int spotX = Integer.parseInt(String.valueOf(stringSpotXY.charAt(0)));
-            int spotY = Integer.parseInt(String.valueOf(stringSpotXY.charAt(1))) - 1;
-            spotXY.add(spotX);
-            spotXY.add(spotY);
             if (isStartSpot) {
                 isSpotValid = Spot.validateStartSpot(board, currentPlayer, spotX, spotY);
             } else {
                 isSpotValid = Spot.validateEndSpot(board, spotX, spotY);
             }
         } while (!isSpotValid);
-        return spotXY;
     }
 
     public void makeMove() throws Exception {
 
         System.out.println(currentPlayer.getName() + " move.");
         // Choosing checker to move
-        List<Integer> startCheckerXY = getSpot(true);
-        int startX = startCheckerXY.get(0);
-        int startY = startCheckerXY.get(1);
+        getSpot(true);
         // Choosing where to move
         while (true) {
-            List<Integer> endSpotXY = getSpot(false);
-            int endX = endSpotXY.get(0);
-            int endY = endSpotXY.get(1);
+            getSpot(false);
             // Making move
             if (Spot.isEndSpotValid(board, currentPlayer, startX, startY, endX, endY)) {
                 board.setSpotsAfterMove(startX, startY, endX, endY);
