@@ -1,5 +1,6 @@
 package checkers.logic.board;
 
+import checkers.logic.game.Game;
 import checkers.logic.piece.Piece;
 import checkers.logic.player.Player;
 
@@ -7,7 +8,6 @@ public class Board {
 
     private final static int BOARD_SIDE_SIZE = 8;
     private Spot[][] boardSpots = new Spot[BOARD_SIDE_SIZE][BOARD_SIDE_SIZE];
-    private Piece piece;
 
     public Spot getBoardSpot(int x, int y) throws Exception {
         if (x < 0 || x > 7 || y < 0 || y > 7) {
@@ -16,12 +16,19 @@ public class Board {
         return boardSpots[x][y];
     }
 
+    public Piece getStartPiece(Game game) throws Exception {
+        return getBoardSpot(game.startX, game.startY).getPiece();
+    }
+
     public Piece getPiece(int x, int y) throws Exception {
         return getBoardSpot(x, y).getPiece();
     }
 
-    public void advancePiece(int x, int y, Player player) throws Exception {
-        if(getPiece(x,y).isRegular()) {
+    public void advancePiece(Game game) throws Exception {
+        int x = game.endX;
+        int y = game.endY;
+        Player player = game.currentPlayer;
+        if(getPiece(x, y).isRegular()) {
             if (y == 7 && player.isWhite()) {
                 boardSpots[x][y] = SpotFactory.uberWhite(x, y);
             } else if (y == 0 && player.isBlack()) {
@@ -38,9 +45,9 @@ public class Board {
         boardSpots[x][y].setPiece(null);
     }
 
-    public void setSpotsAfterMove(int startX, int startY, int endX, int endY) {
-        setEndBoardSpot(startX, startY, endX, endY);
-        setBoardPieceNull(startX, startY);
+    public void setSpotsAfterMove(Game game) {
+        setEndBoardSpot(game.startX, game.startY, game.endX, game.endY);
+        setBoardPieceNull(game.startX, game.startY);
     }
 
     public void printBoard() {

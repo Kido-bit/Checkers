@@ -1,6 +1,7 @@
 package checkers.logic.piece;
 
 import checkers.logic.board.Board;
+import checkers.logic.game.Game;
 import checkers.logic.player.Player;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,9 +33,9 @@ public abstract class Piece {
 
     public abstract boolean isRegular();
 
-    public abstract boolean hasMove(Board board, Player player, int startX, int startY) throws Exception;
+    public abstract boolean hasMove(Game game) throws Exception;
 
-    public boolean hasKill(Board board, Player player, int startX, int startY) throws Exception {
+    public boolean hasKill(Game game) throws Exception {
         return false;
     }
 
@@ -73,58 +74,55 @@ public abstract class Piece {
         return false;
     }
 
-    public boolean upLeftKill(Board board, boolean isPlayerWhite, int startX, int startY) throws Exception {
+    public boolean upLeftKill(Game game) throws Exception {
         return false;
     }
 
-    public boolean upRightKill(Board board, boolean isPlayerWhite, int startX, int startY) throws Exception {
+    public boolean upRightKill(Game game) throws Exception {
         return false;
     }
 
-    public boolean downLeftKill(Board board, boolean isPlayerWhite, int startX, int startY) throws Exception {
+    public boolean downLeftKill(Game game) throws Exception {
         return false;
     }
 
-    public boolean downRightKill(Board board, boolean isPlayerWhite, int startX, int startY) throws Exception {
+    public boolean downRightKill(Game game) throws Exception {
         return false;
     }
 
-    public boolean validateExceptionsKilling(Board board, Player player, int startX, int startY) throws Exception {
+    public boolean validateExceptionsKilling(Game game) throws Exception {
         return false;
     }
 
-    public boolean validateCenterKilling(Board board, Player player, int startX, int startY) throws Exception {
+    public boolean validateCenterKilling(Game game) throws Exception {
         return false;
     }
 
-    public boolean validateLeftSideKilling(Board board, Player player, int startX, int startY) throws Exception {
+    public boolean validateLeftSideKilling(Game game) throws Exception {
         return false;
     }
 
-    public boolean validateRightSideKilling(Board board, Player player, int startX, int startY) throws Exception {
+    public boolean validateRightSideKilling(Game game) throws Exception {
         return false;
     }
 
-    public boolean validateTopKilling(Board board, Player player, int startX, int startY) throws Exception {
+    public boolean validateTopKilling(Game game) throws Exception {
         return false;
     }
 
-    public boolean validateBottomKilling(Board board, Player player, int startX, int startY) throws Exception {
+    public boolean validateBottomKilling(Game game) throws Exception {
         return false;
     }
 
-    public boolean killEnemyPiece(Board board, Player player, int startX, int startY, int endX, int endY) throws Exception {
+    public boolean killEnemyPiece(Game game) throws Exception {
         return false;
     }
 
-    public List<String> possiblePrimaryMoves(Board board, Player player, int startX, int startY) throws Exception{
-        List<String> list = new ArrayList<>();
-        return list;
-    };
+    public List<String> possiblePrimaryMoves(Game game) throws Exception{
+        return new ArrayList<>();
+    }
 
     public Map<String, String> possibleKills(Board board, Player player, int startX, int startY) throws Exception {
-        Map<String, String> map = new HashMap<>();
-        return map;
+        return new HashMap<>();
     }
-
 }

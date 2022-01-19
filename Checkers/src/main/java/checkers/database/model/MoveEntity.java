@@ -1,5 +1,6 @@
 package checkers.database.model;
 
+import checkers.logic.game.Game;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,11 +23,11 @@ public class MoveEntity {
     private String endSpot;
     private boolean isWhite;
 
-    public MoveEntity (int moveNumber, String playerName, String  startSpot, String endSpot, boolean isWhite) {
-        this.moveNumber = moveNumber;
-        this.playerName = playerName;
-        this.startSpot = startSpot;
-        this.endSpot = endSpot;
-        this.isWhite = isWhite;
+    public MoveEntity (Game game) {
+        this.moveNumber = game.getMoveCounter();
+        this.playerName = game.getCurrentPlayer().getName();
+        this.startSpot = game.getStartSpot();
+        this.endSpot = game.getEndSpot();
+        this.isWhite = game.getCurrentPlayer().isWhite();
     }
 }

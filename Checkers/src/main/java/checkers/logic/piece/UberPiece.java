@@ -1,6 +1,7 @@
 package checkers.logic.piece;
 
 import checkers.logic.board.Board;
+import checkers.logic.game.Game;
 import checkers.logic.player.Player;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class UberPiece extends Piece {
     private final boolean REGULAR = false;
+    Map<String, String> possibleKill;
 
     public UberPiece(boolean white) {
         super(white);
@@ -36,39 +38,46 @@ public class UberPiece extends Piece {
     }
 
     @Override
-    public boolean hasMove(Board board, Player player, int startX, int startY) throws Exception {
+    public boolean hasMove(Game game) throws Exception {
+        Board board = game.board;
+        Player player = game.currentPlayer;
+        int startX = game.startX;
+        int startY = game.startY;
         if (player.isWhite()) {
             if (board.pieceIsBlack(startX, startY)) {
                 System.out.println("Not your piece!");
                 return false;
             } else {
-                if(!possiblePrimaryMoves(board, player, startX, startY).isEmpty()) {
+                if(!possiblePrimaryMoves(game).isEmpty()) {
                     return true;
-                } return hasKill(board, player, startX, startY);
+                } return hasKill(game);
             }
         } else {
             if (board.pieceIsWhite(startX, startY)) {
                 System.out.println("Not your piece!");
                 return false;
             } else {
-                if(!possiblePrimaryMoves(board, player, startX, startY).isEmpty()) {
+                if(!possiblePrimaryMoves(game).isEmpty()) {
                     return true;
-                } return hasKill(board, player, startX, startY);
+                } return hasKill(game);
             }
         }
     }
 
-    public List<String> possiblePrimaryMoves(Board board, Player player, int startX, int startY) throws Exception {
+    public List<String> possiblePrimaryMoves(Game game) throws Exception {
         List<String> allPossibleMoves = new ArrayList<>();
-        allPossibleMoves.addAll(upRightMoves(board, startX, startY));
-        allPossibleMoves.addAll(upLeftMoves(board, startX, startY));
-        allPossibleMoves.addAll(downRightMoves(board, startX, startY));
-        allPossibleMoves.addAll(downLeftMoves(board, startX, startY));
+        allPossibleMoves.addAll(upRightMoves(game));
+        allPossibleMoves.addAll(upLeftMoves(game));
+        allPossibleMoves.addAll(downRightMoves(game));
+        allPossibleMoves.addAll(downLeftMoves(game));
         allPossibleMoves.forEach(System.out::println);
         return allPossibleMoves;
     }
 
-    public List<String> upRightMoves(Board board, int startX, int startY) throws Exception {
+    public List<String> upRightMoves(Game game) throws Exception {
+        Board board = game.board;
+        int startX = game.startX;
+        int startY = game.startY;
         List<String> possibleMoves = new ArrayList<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder previousMove = new StringBuilder();
@@ -91,7 +100,10 @@ public class UberPiece extends Piece {
         return possibleMoves;
     }
 
-    public List<String> upLeftMoves(Board board, int startX, int startY) throws Exception {
+    public List<String> upLeftMoves(Game game) throws Exception {
+        Board board = game.board;
+        int startX = game.startX;
+        int startY = game.startY;
         List<String> possibleMoves = new ArrayList<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder previousMove = new StringBuilder();
@@ -114,7 +126,10 @@ public class UberPiece extends Piece {
         return possibleMoves;
     }
 
-    public List<String> downRightMoves(Board board, int startX, int startY) throws Exception {
+    public List<String> downRightMoves(Game game) throws Exception {
+        Board board = game.board;
+        int startX = game.startX;
+        int startY = game.startY;
         List<String> possibleMoves = new ArrayList<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder previousMove = new StringBuilder();
@@ -137,7 +152,10 @@ public class UberPiece extends Piece {
         return possibleMoves;
     }
 
-    public List<String> downLeftMoves(Board board, int startX, int startY) throws Exception {
+    public List<String> downLeftMoves(Game game) throws Exception {
+        Board board = game.board;
+        int startX = game.startX;
+        int startY = game.startY;
         List<String> possibleMoves = new ArrayList<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder previousMove = new StringBuilder();
@@ -161,34 +179,38 @@ public class UberPiece extends Piece {
     }
 
     @Override
-    public boolean hasKill(Board board, Player player, int startX, int startY) throws Exception {
-        return !possibleKills(board, player, startX, startY).isEmpty();
+    public boolean hasKill(Game game) throws Exception {
+        return !possibleKills(game.board, game.currentPlayer, game.startX, game.startY).isEmpty();
     }
 
     @Override
-    public boolean killEnemyPiece(Board board, Player player, int startX, int startY, int endX, int endY) throws Exception {
-        String killed = possibleKills(board, player, startX, startY).get(String.valueOf(endX) + endY);
+    public boolean killEnemyPiece(Game game) throws Exception {
+        String killed = possibleKills(game).get(String.valueOf(game.endX) + game.endY);
         if (killed == null) {
             return false;
         } else {
-            board.setBoardPieceNull(Integer.parseInt(String.valueOf(killed.charAt(0))),
+            game.board.setBoardPieceNull(Integer.parseInt(String.valueOf(killed.charAt(0))),
                     Integer.parseInt(String.valueOf(killed.charAt(1))));
             return true;
         }
     }
 
-    public Map<String, String> possibleKills(Board board, Player player, int startX, int startY) throws Exception {
+    public Map<String, String> possibleKills(Game game) throws Exception {
         Map<String, String> allPossibleKills = new HashMap<>();
-        allPossibleKills.putAll(upRightKill(board, player, startX, startY));
-        allPossibleKills.putAll(upLeftKill(board, player, startX, startY));
-        allPossibleKills.putAll(downRightKill(board, player, startX, startY));
-        allPossibleKills.putAll(downLeftKill(board, player, startX, startY));
+        allPossibleKills.putAll(upRightKillUber(game));
+        allPossibleKills.putAll(upLeftKillUber(game));
+        allPossibleKills.putAll(downRightKillUber(game));
+        allPossibleKills.putAll(downLeftKillUber(game));
         allPossibleKills.forEach((key, value) -> System.out.println(key + ":" + value));
         return allPossibleKills;
     }
 
-    public Map<String, String> upRightKill(Board board, Player player, int startX, int startY) throws Exception {
-        Map<String, String> possibleKill = new HashMap<>();
+    public Map<String, String> upRightKillUber(Game game) throws Exception {
+        Board board = game.board;
+        Player player = game.currentPlayer;
+        int startX = game.startX;
+        int startY = game.startY;
+        possibleKill = new HashMap<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder killedPiece = new StringBuilder();
         if (startX >= 6 || startY >= 6) {
@@ -198,7 +220,7 @@ public class UberPiece extends Piece {
                 for (int i = 1; i < 6 && startX + i <= 6 && startY + i <= 6; i++) {
                     if (board.hasNoPiece(startX + i, startY + i)) {
                         continue;
-                    } else if (board.hasPiece(startX + i, startY + i) && !board.getPiece(startX + i, startY + i).isWhite()) {
+                    } else if (board.hasPiece(startX + i, startY + i) && !board.getPiece(game.startX + i, game.startY + i).isWhite()) {
                         if (board.hasNoPiece(startX + i + 1, startY + i + 1)) {
                             possibleKill.put(actualMove.append(startX + i + 1).append(startY + i + 1).toString(),
                                     killedPiece.append(startX + i).append(startY + i).toString());
@@ -227,8 +249,12 @@ public class UberPiece extends Piece {
         return possibleKill;
     }
 
-    public Map<String, String> upLeftKill(Board board, Player player, int startX, int startY) throws Exception {
-        Map<String, String> possibleKill = new HashMap<>();
+    public Map<String, String> upLeftKillUber(Game game) throws Exception {
+        Board board = game.board;
+        Player player = game.currentPlayer;
+        int startX = game.startX;
+        int startY = game.startY;
+        possibleKill = new HashMap<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder killedPiece = new StringBuilder();
         if (startX <= 1 || startY >= 6) {
@@ -265,8 +291,12 @@ public class UberPiece extends Piece {
         return possibleKill;
     }
 
-    public Map<String, String> downRightKill(Board board, Player player, int startX, int startY) throws Exception {
-        Map<String, String> possibleKill = new HashMap<>();
+    public Map<String, String> downRightKillUber(Game game) throws Exception {
+        Board board = game.board;
+        Player player = game.currentPlayer;
+        int startX = game.startX;
+        int startY = game.startY;
+        possibleKill = new HashMap<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder killedPiece = new StringBuilder();
         if (startX >= 6 || startY <= 1) {
@@ -303,8 +333,12 @@ public class UberPiece extends Piece {
         return possibleKill;
     }
 
-    public Map<String, String> downLeftKill(Board board, Player player, int startX, int startY) throws Exception {
-        Map<String, String> possibleKill = new HashMap<>();
+    public Map<String, String> downLeftKillUber(Game game) throws Exception {
+        Board board = game.board;
+        Player player = game.currentPlayer;
+        int startX = game.startX;
+        int startY = game.startY;
+        possibleKill = new HashMap<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder killedPiece = new StringBuilder();
         if (startX <= 1 || startY <= 1) {

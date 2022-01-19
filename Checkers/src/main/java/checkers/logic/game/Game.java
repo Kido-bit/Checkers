@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 public class Game {
 
     private List<Player> players;
-    private Board board;
-    private Player currentPlayer;
+    public Board board;
+    public Player currentPlayer;
     private GameStatus status;
     private int moveCounter = 0;
     private static Scanner scanner = new Scanner(System.in);
@@ -45,6 +45,9 @@ public class Game {
     public int endX;
     public int endY;
 
+    public Game getGame() {
+        return this;
+    }
 
     public void runGame() throws Exception {
         Menu.mainMenu();
@@ -83,19 +86,11 @@ public class Game {
         playerDao.reset();
         moveDao.reset();
         players = createPlayers();
-        initializeNewGame(players);
+        initializeNewGame();
         getBoard().printBoard();
     }
 
-    public void continueGame() throws Exception {
-        List<PlayerEntity> all = playerDao.getAll();
-        this.players = all.stream()
-                .map(Player::new)
-                .collect(Collectors.toList());
-        initializeContinue(players);
-    }
-
-    public void initializeNewGame(List<Player> players) {
+    public void initializeNewGame() {
 
         board = new Board();
         board.resetBoard();
@@ -108,10 +103,17 @@ public class Game {
         } else {
             currentPlayer = player2;
         }
-
     }
 
-    public void initializeContinue(List<Player> players) throws Exception {
+    public void continueGame() throws Exception {
+        List<PlayerEntity> all = playerDao.getAll();
+        this.players = all.stream()
+                .map(Player::new)
+                .collect(Collectors.toList());
+        initializeContinue();
+    }
+
+    public void initializeContinue() throws Exception {
 
         List<MoveEntity> all = moveDao.getAll();
         List<Move> moves = all.stream()
@@ -121,38 +123,38 @@ public class Game {
         board = new Board();
         board.resetBoard();
 
-        Player player1 = players.get(0);
-        Player player2 = players.get(1);
+        Player whitePlayer = players.get(0);
+        Player blackPlayer = players.get(1);
 
-        if (player1.isWhite()) {
-            currentPlayer = player1;
+        if (whitePlayer.isWhite()) {
+            currentPlayer = whitePlayer;
         } else {
-            currentPlayer = player2;
+            currentPlayer = blackPlayer;
         }
 
         for (Move move : moves) {
             String startInput = move.getStart();
             String startSpotXY = convertPlayerInput(startInput);
-            int startX = Integer.parseInt(String.valueOf(startSpotXY.charAt(0)));
-            int startY = Integer.parseInt(String.valueOf(startSpotXY.charAt(1))) - 1;
+            startX = Integer.parseInt(String.valueOf(startSpotXY.charAt(0)));
+            startY = Integer.parseInt(String.valueOf(startSpotXY.charAt(1))) - 1;
 
             String endInput = move.getEnd();
             String endSpotXY = convertPlayerInput(endInput);
-            int endX = Integer.parseInt(String.valueOf(endSpotXY.charAt(0)));
-            int endY = Integer.parseInt(String.valueOf(endSpotXY.charAt(1))) - 1;
+            endX = Integer.parseInt(String.valueOf(endSpotXY.charAt(0)));
+            endY = Integer.parseInt(String.valueOf(endSpotXY.charAt(1))) - 1;
 
             board.getBoardSpot(endX, endY);
-            if (Spot.isEndSpotValid(board, currentPlayer, startX, startY, endX, endY)) {
-                board.setSpotsAfterMove(startX, startY, endX, endY);
-                board.advancePiece(endX, endY, currentPlayer);
-            } else if (board.getPiece(startX, startY).hasKill(board, currentPlayer, startX, startY)) {
-                if (board.getPiece(startX, startY).killEnemyPiece(board, currentPlayer, startX, startY, endX, endY)) {
+            if (Spot.isEndSpotValid(this)) {
+                board.setSpotsAfterMove(this);
+                board.advancePiece(this);
+            } else if (board.getStartPiece(this).hasKill(this)) {
+                if (board.getStartPiece(this).killEnemyPiece(this)) {
                     currentPlayer.killCounter();
-                    board.setSpotsAfterMove(startX, startY, endX, endY);
-                    board.advancePiece(endX, endY, currentPlayer);
+                    board.setSpotsAfterMove(this);
+                    board.advancePiece(this);
                     startX = endX;
                     startY = endY;
-                    if (board.getPiece(startX, startY).hasKill(board, currentPlayer, startX, startY)) {
+                    if (board.getStartPiece(this).hasKill(this)) {
                         continue;
                     }
                 }
@@ -217,7 +219,7 @@ public class Game {
                 endY = spotY;
             }
             if (isStartSpot) {
-                isSpotValid = Spot.validateStartSpot(board, currentPlayer, spotX, spotY);
+                isSpotValid = Spot.validateStartSpot(this);
             } else {
                 isSpotValid = Spot.validateEndSpot(board, spotX, spotY);
             }
@@ -229,29 +231,27 @@ public class Game {
         System.out.println(currentPlayer.getName() + " move.");
         // Choosing checker to move
         getSpot(true);
-        // Choosing where to move
         while (true) {
+            // Choosing where to move
             getSpot(false);
             // Making move
-            if (Spot.isEndSpotValid(board, currentPlayer, startX, startY, endX, endY)) {
-                board.setSpotsAfterMove(startX, startY, endX, endY);
-                moveCounter += 1;
-                board.advancePiece(endX, endY, currentPlayer);
-                moveDao.add(new MoveEntity(moveCounter, currentPlayer.getName(), startSpot, endSpot, currentPlayer.isWhite()));
+            if (Spot.isEndSpotValid(this)) {
+                board.setSpotsAfterMove(this);
+                board.advancePiece(this);
+                moveDao.add(new MoveEntity(this));
                 getBoard().printBoard();
                 break;
                 // Making kill
-            } else if (board.getPiece(startX, startY).hasKill(board, currentPlayer, startX, startY)) {
-                if (board.getPiece(startX, startY).killEnemyPiece(board, currentPlayer, startX, startY, endX, endY)) {
+            } else if (board.getStartPiece(this).hasKill(this)) {
+                if (board.getStartPiece(this).killEnemyPiece(this)) {
                     currentPlayer.killCounter();
-                    board.setSpotsAfterMove(startX, startY, endX, endY);
-                    moveCounter += 1;
-                    board.advancePiece(endX, endY, currentPlayer);
+                    board.setSpotsAfterMove(this);
+                    board.advancePiece(this);
                     getBoard().printBoard();
                     startX = endX;
                     startY = endY;
-                    moveDao.add(new MoveEntity(moveCounter, currentPlayer.getName(), startSpot, endSpot, currentPlayer.isWhite()));
-                    if (board.getPiece(startX, startY).hasKill(board, currentPlayer, startX, startY)) {
+                    moveDao.add(new MoveEntity(this));
+                    if (board.getStartPiece(this).hasKill(this)) {
                         startSpot = endSpot;
                         System.out.println("Another kill!");
                     } else {
@@ -261,6 +261,7 @@ public class Game {
                     System.out.println("Invalid Spot!");
                 }
             }
+            moveCounter += 1;
         }
         if (currentPlayer.kills == 12) {
             status = GameStatus.END;

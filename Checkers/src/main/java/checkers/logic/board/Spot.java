@@ -1,5 +1,6 @@
 package checkers.logic.board;
 
+import checkers.logic.game.Game;
 import checkers.logic.piece.Piece;
 import checkers.logic.player.Player;
 import lombok.AllArgsConstructor;
@@ -17,14 +18,16 @@ public class Spot {
     private int y;
     private Piece piece;
 
-    public static boolean validateStartSpot(Board board, Player player, int startX, int startY) throws Exception {
-        if (board.isEmpty(startX, startY)) {
+    public static boolean validateStartSpot(Game game) throws Exception {
+        Board board = game.board;
+        Player player = game.currentPlayer;
+        if (board.isEmpty(game.startX, game.startY)) {
             System.out.println("Invalid board spot!");
-        } else if (board.hasNoPiece(startX, startY)) {
+        } else if (board.hasNoPiece(game.startX, game.startY)) {
             System.out.println("No checker here!");
-        } else if ((player.isWhite() && board.pieceIsBlack(startX, startY)) || (player.isBlack()) && board.pieceIsWhite(startX, startY)){
+        } else if ((player.isWhite() && board.pieceIsBlack(game.startX, game.startY)) || (player.isBlack()) && board.pieceIsWhite(game.startX, game.startY)) {
             System.out.println("Not your checker!");
-        } else return board.getPiece(startX, startY).hasMove(board, player, startX, startY);
+        } else return board.getStartPiece(game).hasMove(game);
         return false;
     }
 
@@ -49,26 +52,22 @@ public class Spot {
         return false;
     }
 
-    public boolean isStartSpotValid(Board board, Player player, Piece piece, int startX, int startY) throws Exception {
-        if(piece.isRegular()) {
-            return piece.hasMove(board, player, startX, startY);
+    public boolean isStartSpotValid(Game game) throws Exception {
+        Board board = game.board;
+        if (piece.isRegular()) {
+            return piece.hasMove(game);
         } else {
-            if(piece.hasMove(board, player, startX, startY)){
+            if (piece.hasMove(game)) {
                 return true;
-            } else return board.getPiece(startX, startY).hasKill(board, player, startX, startY);
+            } else return board.getStartPiece(game).hasKill(game);
         }
     }
 
-    public static boolean isEndSpotValid(Board board, Player player, int startX, int startY, int endX, int endY) throws Exception {
-        if (board.hasPiece(endX, endY)) {
-            System.out.println("Invalid move!");
-            return false;
+    public static boolean isEndSpotValid(Game game) throws Exception {
+        if (game.board.getStartPiece(game).isRegular()) {
+            return checkPrimaryMove(game.currentPlayer, game.startX, game.startY, game.endX, game.endY);
         } else {
-            if(board.getPiece(startX,startY).isRegular()) {
-                return checkPrimaryMove(player, startX, startY, endX, endY);
-            } else {
-                return board.getPiece(startX,startY).possiblePrimaryMoves(board,player,startX,startY).contains(String.valueOf(endX) + endY);
-            }
+            return game.board.getStartPiece(game).possiblePrimaryMoves(game).contains(String.valueOf(game.endX) + game.endY);
         }
     }
 }
