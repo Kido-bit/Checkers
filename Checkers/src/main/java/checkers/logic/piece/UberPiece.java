@@ -43,10 +43,9 @@ public class UberPiece extends Piece {
     public boolean hasMove(GameStatusModule gameStatusModule) throws Exception {
         Board board = gameStatusModule.getBoard();
         Player player = gameStatusModule.getPlayer();
-        int startX = gameStatusModule.getStartSpot().getPoint().getX();
-        int startY = gameStatusModule.getStartSpot().getPoint().getY();
+        Point point = gameStatusModule.getStartSpot().getPoint();
         if (player.isWhite()) {
-            if (board.pieceIsBlack(startX, startY)) {
+            if (board.pieceIsBlack(point)) {
                 System.out.println("Not your piece!");
                 return false;
             } else {
@@ -55,7 +54,7 @@ public class UberPiece extends Piece {
                 } return hasKill(gameStatusModule);
             }
         } else {
-            if (board.pieceIsWhite(startX, startY)) {
+            if (board.pieceIsWhite(point)) {
                 System.out.println("Not your piece!");
                 return false;
             } else {
@@ -66,20 +65,21 @@ public class UberPiece extends Piece {
         }
     }
 
-    public List<String> possiblePrimaryMoves(Game game) throws Exception {
+    public List<String> possiblePrimaryMoves(GameStatusModule gameStatusModule) throws Exception {
         List<String> allPossibleMoves = new ArrayList<>();
-        allPossibleMoves.addAll(upRightMoves(game));
-        allPossibleMoves.addAll(upLeftMoves(game));
-        allPossibleMoves.addAll(downRightMoves(game));
-        allPossibleMoves.addAll(downLeftMoves(game));
+        allPossibleMoves.addAll(upRightMoves(gameStatusModule));
+        allPossibleMoves.addAll(upLeftMoves(gameStatusModule));
+        allPossibleMoves.addAll(downRightMoves(gameStatusModule));
+        allPossibleMoves.addAll(downLeftMoves(gameStatusModule));
         allPossibleMoves.forEach(System.out::println);
         return allPossibleMoves;
     }
 
-    public List<String> upRightMoves(Game game) throws Exception {
-        Board board = game.board;
-        int startX = game.startX;
-        int startY = game.startY;
+    public List<String> upRightMoves(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         List<String> possibleMoves = new ArrayList<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder previousMove = new StringBuilder();
@@ -87,11 +87,11 @@ public class UberPiece extends Piece {
             for (int i = 1; i < 7 && startX + i <= 7 && startY + i <= 7; i++) {
                 actualMove.setLength(0);
                 if (i < 2) {
-                    if (board.hasNoPiece(startX + i, startY + i)) {
+                    if (board.hasNoPiece(point.getPoint(i, i))) {
                         possibleMoves.add(actualMove.append(startX + i).append(startY + i).toString());
                     }
                 } else {
-                    if (possibleMoves.contains(previousMove.toString()) && board.hasNoPiece(startX + i, startY + i)) {
+                    if (possibleMoves.contains(previousMove.toString()) && board.hasNoPiece(point.getPoint(i, i))) {
                         possibleMoves.add(actualMove.append(startX + i).append(startY + i).toString());
                     }
                 }
@@ -102,10 +102,11 @@ public class UberPiece extends Piece {
         return possibleMoves;
     }
 
-    public List<String> upLeftMoves(Game game) throws Exception {
-        Board board = game.board;
-        int startX = game.startX;
-        int startY = game.startY;
+    public List<String> upLeftMoves(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         List<String> possibleMoves = new ArrayList<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder previousMove = new StringBuilder();
@@ -113,11 +114,11 @@ public class UberPiece extends Piece {
             for (int i = 1; i < 7 && startX - i >= 0 && startY + i <= 7; i++) {
                 actualMove.setLength(0);
                 if (i < 2) {
-                    if (board.hasNoPiece(startX - i, startY + i)) {
+                    if (board.hasNoPiece(point.getPoint(-i, i))) {
                         possibleMoves.add(actualMove.append(startX - i).append(startY + i).toString());
                     }
                 } else {
-                    if (possibleMoves.contains(previousMove.toString()) && board.hasNoPiece(startX - i, startY + i)) {
+                    if (possibleMoves.contains(previousMove.toString()) && board.hasNoPiece(point.getPoint(-i, i))) {
                         possibleMoves.add(actualMove.append(startX - i).append(startY + i).toString());
                     }
                 }
@@ -128,10 +129,11 @@ public class UberPiece extends Piece {
         return possibleMoves;
     }
 
-    public List<String> downRightMoves(Game game) throws Exception {
-        Board board = game.board;
-        int startX = game.startX;
-        int startY = game.startY;
+    public List<String> downRightMoves(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         List<String> possibleMoves = new ArrayList<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder previousMove = new StringBuilder();
@@ -139,11 +141,11 @@ public class UberPiece extends Piece {
             for (int i = 1; i < 7 && startX + i <= 7 && startY - i >= 0; i++) {
                 actualMove.setLength(0);
                 if (i < 2) {
-                    if (board.hasNoPiece(startX + i, startY - i)) {
+                    if (board.hasNoPiece(point.getPoint(i, -i))) {
                         possibleMoves.add(actualMove.append(startX + i).append(startY - i).toString());
                     }
                 } else {
-                    if (possibleMoves.contains(previousMove.toString()) && board.hasNoPiece(startX + i, startY - i)) {
+                    if (possibleMoves.contains(previousMove.toString()) && board.hasNoPiece(point.getPoint(i, -i))) {
                         possibleMoves.add(actualMove.append(startX + i).append(startY - i).toString());
                     }
                 }
@@ -154,10 +156,11 @@ public class UberPiece extends Piece {
         return possibleMoves;
     }
 
-    public List<String> downLeftMoves(Game game) throws Exception {
-        Board board = game.board;
-        int startX = game.startX;
-        int startY = game.startY;
+    public List<String> downLeftMoves(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         List<String> possibleMoves = new ArrayList<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder previousMove = new StringBuilder();
@@ -165,11 +168,11 @@ public class UberPiece extends Piece {
             for (int i = 1; i < 7 && startX - i >= 0 && startY - i >= 0; i++) {
                 actualMove.setLength(0);
                 if (i < 2) {
-                    if (board.hasNoPiece(startX - i, startY - i)) {
+                    if (board.hasNoPiece(point.getPoint(-i, -i))) {
                         possibleMoves.add(actualMove.append(startX - i).append(startY - i).toString());
                     }
                 } else {
-                    if (possibleMoves.contains(previousMove.toString()) && board.hasNoPiece(startX - i, startY - i)) {
+                    if (possibleMoves.contains(previousMove.toString()) && board.hasNoPiece(point.getPoint(-i, -i))) {
                         possibleMoves.add(actualMove.append(startX - i).append(startY - i).toString());
                     }
                 }
@@ -181,37 +184,39 @@ public class UberPiece extends Piece {
     }
 
     @Override
-    public boolean hasKill(Game game) throws Exception {
-        return !possibleKills(game).isEmpty();
+    public boolean hasKill(GameStatusModule gameStatusModule) throws Exception {
+        return !possibleKills(gameStatusModule).isEmpty();
     }
 
     @Override
-    public boolean killEnemyPiece(Game game) throws Exception {
-        String killed = possibleKills(game).get(String.valueOf(game.endX) + game.endY);
+    public boolean killEnemyPiece(GameStatusModule gameStatusModule) throws Exception {
+        String killed = possibleKills(gameStatusModule).get(String.valueOf(gameStatusModule.getEndSpot().getPoint().getX()) +
+                gameStatusModule.getEndSpot().getPoint().getY());
         if (killed == null) {
             return false;
         } else {
-            game.board.setBoardPieceNull(Integer.parseInt(String.valueOf(killed.charAt(0))),
+            gameStatusModule.getBoard().setBoardPieceNull(Integer.parseInt(String.valueOf(killed.charAt(0))),
                     Integer.parseInt(String.valueOf(killed.charAt(1))));
             return true;
         }
     }
 
-    public Map<String, String> possibleKills(Game game) throws Exception {
+    public Map<String, String> possibleKills(GameStatusModule gameStatusModule) throws Exception {
         Map<String, String> allPossibleKills = new HashMap<>();
-        allPossibleKills.putAll(upRightKillUber(game));
-        allPossibleKills.putAll(upLeftKillUber(game));
-        allPossibleKills.putAll(downRightKillUber(game));
-        allPossibleKills.putAll(downLeftKillUber(game));
+        allPossibleKills.putAll(upRightKillUber(gameStatusModule));
+        allPossibleKills.putAll(upLeftKillUber(gameStatusModule));
+        allPossibleKills.putAll(downRightKillUber(gameStatusModule));
+        allPossibleKills.putAll(downLeftKillUber(gameStatusModule));
         allPossibleKills.forEach((key, value) -> System.out.println(key + ":" + value));
         return allPossibleKills;
     }
 
-    public Map<String, String> upRightKillUber(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
+    public Map<String, String> upRightKillUber(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         possibleKill = new HashMap<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder killedPiece = new StringBuilder();
@@ -220,10 +225,10 @@ public class UberPiece extends Piece {
         } else {
             if (player.isWhite()) {
                 for (int i = 1; i < 6 && startX + i <= 6 && startY + i <= 6; i++) {
-                    if (board.hasNoPiece(startX + i, startY + i)) {
+                    if (board.hasNoPiece(point.getPoint(i, i))) {
                         continue;
-                    } else if (board.hasPiece(startX + i, startY + i) && !board.getPiece(game.startX + i, game.startY + i).isWhite()) {
-                        if (board.hasNoPiece(startX + i + 1, startY + i + 1)) {
+                    } else if (board.hasPiece(point.getPoint(i, i)) && !board.getPiece(gameStatusModule).isWhite()) {
+                        if (board.hasNoPiece(point.getPoint(i + 1, i + 1))) {
                             possibleKill.put(actualMove.append(startX + i + 1).append(startY + i + 1).toString(),
                                     killedPiece.append(startX + i).append(startY + i).toString());
                             return possibleKill;
@@ -234,10 +239,10 @@ public class UberPiece extends Piece {
                 }
             } else {
                 for (int i = 1; i < 6 && startX + i <= 6 && startY + i <= 6; i++) {
-                    if (board.hasNoPiece(startX + i, startY + i)) {
+                    if (board.hasNoPiece(point.getPoint(i, i))) {
                         continue;
-                    } else if (board.hasPiece(startX + i, startY + i) && board.getPiece(startX + i, startY + i).isWhite()
-                            && board.hasNoPiece(startX + i + 1, startY + i + 1)) {
+                    } else if (board.hasPiece(point.getPoint(i, i)) && board.getPiece(gameStatusModule).isWhite()
+                            && board.hasNoPiece(point.getPoint(i + 1, i + 1))) {
                         possibleKill.put(actualMove.append(startX + i + 1).append(startY + i + 1).toString(),
                                 killedPiece.append(startX + i).append(startY + i).toString());
                         return possibleKill;
@@ -251,11 +256,12 @@ public class UberPiece extends Piece {
         return possibleKill;
     }
 
-    public Map<String, String> upLeftKillUber(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
+    public Map<String, String> upLeftKillUber(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         possibleKill = new HashMap<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder killedPiece = new StringBuilder();
@@ -264,10 +270,10 @@ public class UberPiece extends Piece {
         } else {
             if (player.isWhite()) {
                 for (int i = 1; i < 6 && startX - i >= 1 && startY + i <= 6; i++) {
-                    if (board.hasNoPiece(startX - i, startY + i)) {
+                    if (board.hasNoPiece(point.getPoint(-i, i))) {
                         continue;
-                    } else if (board.hasPiece(startX - i, startY + i) && !board.getPiece(startX - i, startY + i).isWhite()
-                            && board.hasNoPiece(startX - i - 1, startY + i + 1)) {
+                    } else if (board.hasPiece(point.getPoint(-i, i)) && !board.getPiece(gameStatusModule).isWhite()
+                            && board.hasNoPiece(point.getPoint(-i - 1, i + 1))) {
                         possibleKill.put(actualMove.append(startX - i - 1).append(startY + i + 1).toString(),
                                 killedPiece.append(startX - i).append(startY + i).toString());
                         return possibleKill;
@@ -277,10 +283,10 @@ public class UberPiece extends Piece {
                 }
             } else {
                 for (int i = 1; i < 6 && startX - i >= 1 && startY + i <= 6; i++) {
-                    if (board.hasNoPiece(startX - i, startY + i)) {
+                    if (board.hasNoPiece(point.getPoint(-i, i))) {
                         continue;
-                    } else if (board.hasPiece(startX - i, startY + i) && board.getPiece(startX - i, startY + i).isWhite()
-                            && board.hasNoPiece(startX - i - 1, startY + i + 1)) {
+                    } else if (board.hasPiece(point.getPoint(-i, i)) && board.getPiece(gameStatusModule).isWhite()
+                            && board.hasNoPiece(point.getPoint(-i - 1, i + 1))) {
                         possibleKill.put(actualMove.append(startX - i - 1).append(startY + i + 1).toString(),
                                 killedPiece.append(startX - i).append(startY + i).toString());
                         return possibleKill;
@@ -293,11 +299,12 @@ public class UberPiece extends Piece {
         return possibleKill;
     }
 
-    public Map<String, String> downRightKillUber(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
+    public Map<String, String> downRightKillUber(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         possibleKill = new HashMap<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder killedPiece = new StringBuilder();
@@ -306,10 +313,10 @@ public class UberPiece extends Piece {
         } else {
             if (player.isWhite()) {
                 for (int i = 1; i < 6 && startX + i <= 6 && startY - i >= 1; i++) {
-                    if (board.hasNoPiece(startX + i, startY - i)) {
+                    if (board.hasNoPiece(point.getPoint(i, -i))) {
                         continue;
-                    } else if (board.hasPiece(startX + i, startY - i) && !board.getPiece(startX + i, startY - i).isWhite()
-                            && board.hasNoPiece(startX + i + 1, startY - i - 1)) {
+                    } else if (board.hasPiece(point.getPoint(i + 1, -i - 1)) && !board.getPiece(gameStatusModule).isWhite()
+                            && board.hasNoPiece(point.getPoint(i + 1, -i - 1))) {
                         possibleKill.put(actualMove.append(startX + i + 1).append(startY - i - 1).toString(),
                                 killedPiece.append(startX + i).append(startY - i).toString());
                         return possibleKill;
@@ -319,10 +326,10 @@ public class UberPiece extends Piece {
                 }
             } else {
                 for (int i = 1; i < 6 && startX + i <= 6 && startY - i >= 1; i++) {
-                    if (board.hasNoPiece(startX + i, startY - i)) {
+                    if (board.hasNoPiece(point.getPoint(i, -i))) {
                         continue;
-                    } else if (board.hasPiece(startX + i, startY - i) && board.getPiece(startX + i, startY - i).isWhite()
-                            && board.hasNoPiece(startX + i + 1, startY - i - 1)) {
+                    } else if (board.hasPiece(point.getPoint(i, -i)) && board.getPiece(gameStatusModule).isWhite()
+                            && board.hasNoPiece(point.getPoint(i + 1, -i - 1))) {
                         possibleKill.put(actualMove.append(startX + i + 1).append(startY - i - 1).toString(),
                                 killedPiece.append(startX + i).append(startY - i).toString());
                         return possibleKill;
@@ -335,11 +342,12 @@ public class UberPiece extends Piece {
         return possibleKill;
     }
 
-    public Map<String, String> downLeftKillUber(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
+    public Map<String, String> downLeftKillUber(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         possibleKill = new HashMap<>();
         StringBuilder actualMove = new StringBuilder();
         StringBuilder killedPiece = new StringBuilder();
@@ -348,10 +356,10 @@ public class UberPiece extends Piece {
         } else {
             if (player.isWhite()) {
                 for (int i = 1; i < 6 && startX - i >= 1 && startY - i >= 1; i++) {
-                    if (board.hasNoPiece(startX - i, startY - i)) {
+                    if (board.hasNoPiece(point.getPoint(-i, -i))) {
                         continue;
-                    } else if (board.hasPiece(startX - i, startY - i) && !board.getPiece(startX - i, startY - i).isWhite()
-                            && board.hasNoPiece(startX - i - 1, startY - i - 1)) {
+                    } else if (board.hasPiece(point.getPoint(-i, -i)) && !board.getPiece(gameStatusModule).isWhite()
+                            && board.hasNoPiece(point.getPoint(-i - 1, -i - 1))) {
                         possibleKill.put(actualMove.append(startX - i - 1).append(startY - i - 1).toString(),
                                 killedPiece.append(startX - i).append(startY - i).toString());
                         return possibleKill;
@@ -361,10 +369,10 @@ public class UberPiece extends Piece {
                 }
             } else {
                 for (int i = 1; i < 6 && startX - i >= 1 && startY - i >= 1; i++) {
-                    if (board.hasNoPiece(startX - i, startY - i)) {
+                    if (board.hasNoPiece(point.getPoint(-i, -i))) {
                         continue;
-                    } else if (board.hasPiece(startX - i, startY - i) && board.getPiece(startX - i, startY - i).isWhite()
-                            && board.hasNoPiece(startX - i - 1, startY - i - 1)) {
+                    } else if (board.hasPiece(point.getPoint(-i, -i)) && board.getPiece(gameStatusModule).isWhite()
+                            && board.hasNoPiece(point.getPoint(-i - 1, -i - 1))) {
                         possibleKill.put(actualMove.append(startX - i - 1).append(startY - i - 1).toString(),
                                 killedPiece.append(startX - i).append(startY - i).toString());
                         return possibleKill;

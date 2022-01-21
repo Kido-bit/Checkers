@@ -8,6 +8,8 @@ import lombok.*;
 
 import java.awt.event.MouseEvent;
 
+import static checkers.logic.board.SpotFactory.*;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -35,15 +37,16 @@ public class Board {
         return gameStatusModule.getEndSpot().getPiece();
     }
 
-    public void advancePiece(Game game) throws Exception {
-        int x = game.endX;
-        int y = game.endY;
-        Player player = game.currentPlayer;
-        if(getPiece(x, y).isRegular()) {
+    public void advancePiece(GameStatusModule gameStatusModule) throws Exception {
+        int x = gameStatusModule.getEndSpot().getPoint().getX();
+        int y = gameStatusModule.getEndSpot().getPoint().getY();
+        Player player = gameStatusModule.getPlayer();
+        Point point = gameStatusModule.getEndSpot().getPoint();
+        if(getPiece(gameStatusModule).isRegular()) {
             if (y == 7 && player.isWhite()) {
-                boardSpots[x][y] = SpotFactory.uberWhite(x, y);
+                boardSpots[x][y] = uberWhite(point);
             } else if (y == 0 && player.isBlack()) {
-                boardSpots[x][y] = SpotFactory.uberBlack(x, y);
+                boardSpots[x][y] = uberBlack(point);
             }
         }
     }
@@ -56,9 +59,13 @@ public class Board {
         boardSpots[x][y].setPiece(null);
     }
 
-    public void setSpotsAfterMove(Game game) {
-        setEndBoardSpot(game.startX, game.startY, game.endX, game.endY);
-        setBoardPieceNull(game.startX, game.startY);
+    public void setSpotsAfterMove(GameStatusModule gameStatusModule) {
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
+        int endX = gameStatusModule.getEndSpot().getPoint().getX();
+        int endY = gameStatusModule.getEndSpot().getPoint().getX();
+        setEndBoardSpot(startX, startY, endX, endY);
+        setBoardPieceNull(startX, startY);
     }
 
     public void setBoardSpot(int x, int y, Spot spotFactory) {
@@ -82,64 +89,91 @@ public class Board {
         System.out.println("\n   a b c d e f g h");
     }
 
-    public boolean pieceIsWhite(int x, int y) throws Exception {
-        return hasPiece(x, y) && getBoardSpot(x, y).getPiece().isWhite();
+    public boolean pieceIsWhite(Point point) throws Exception {
+        return hasPiece(point) && getBoardSpot(point).getPiece().isWhite();
     }
 
-    public boolean pieceIsBlack(int x, int y) throws Exception {
-        return hasPiece(x, y) && !pieceIsWhite(x, y);
+    public boolean pieceIsBlack(Point point) throws Exception {
+        return hasPiece(point) && !pieceIsWhite(point);
     }
 
-    public boolean hasPiece(int x, int y) throws Exception {
-        return getBoardSpot(x, y).getPiece() != null;
+    public boolean hasPiece(Point point) throws Exception {
+        return getBoardSpot(point).getPiece() != null;
     }
 
-    public boolean hasNoPiece(int x, int y) throws Exception {
-        return !hasPiece(x, y);
+    public boolean hasNoPiece(Point point) throws Exception {
+        return !hasPiece(point);
     }
 
-    public boolean isEmpty(int x, int y) throws Exception {
-        return getBoardSpot(x, y) == null;
+    public boolean isEmpty(Point point) throws Exception {
+        return getBoardSpot(point) == null;
     }
 
     public void resetBoard() {
 
-        boardSpots[0][0] = SpotFactory.regularWhite(0, 0);
-        boardSpots[2][0] = SpotFactory.regularWhite(2, 0);
-        boardSpots[4][0] = SpotFactory.regularWhite(4, 0);
-        boardSpots[6][0] = SpotFactory.regularWhite(6, 0);
-        boardSpots[1][1] = SpotFactory.regularWhite(1, 1);
-        boardSpots[3][1] = SpotFactory.regularWhite(3, 1);
-        boardSpots[5][1] = SpotFactory.regularWhite(5, 1);
-        boardSpots[7][1] = SpotFactory.regularWhite(7, 1);
-        boardSpots[0][2] = SpotFactory.regularWhite(0, 2);
-        boardSpots[2][2] = SpotFactory.regularWhite(2, 2);
-        boardSpots[4][2] = SpotFactory.regularWhite(4, 2);
-        boardSpots[6][2] = SpotFactory.regularWhite(6, 2);
+        boardSpots[0][0] = regularWhite(new Point(0, 0));
+        boardSpots[2][0] = regularWhite(new Point(2, 0));
+        boardSpots[4][0] = regularWhite(new Point(4, 0));
+        boardSpots[6][0] = regularWhite(new Point(6, 0));
+        boardSpots[1][1] = regularWhite(new Point(1, 1));
+        boardSpots[3][1] = regularWhite(new Point(3, 1));
+        boardSpots[5][1] = regularWhite(new Point(5, 1));
+        boardSpots[7][1] = regularWhite(new Point(7, 1));
+        boardSpots[0][2] = regularWhite(new Point(0, 2));
+        boardSpots[2][2] = regularWhite(new Point(2, 2));
+        boardSpots[4][2] = regularWhite(new Point(4, 2));
+        boardSpots[6][2] = regularWhite(new Point(6, 2));
+//        boardSpots[6][0] = regularWhite(6, 0);
+//        boardSpots[1][1] = regularWhite(1, 1);
+//        boardSpots[3][1] = regularWhite(3, 1);
+//        boardSpots[5][1] = regularWhite(5, 1);
+//        boardSpots[7][1] = regularWhite(7, 1);
+//        boardSpots[0][2] = regularWhite(0, 2);
+//        boardSpots[2][2] = regularWhite(2, 2);
+//        boardSpots[4][2] = regularWhite(4, 2);
+//        boardSpots[6][2] = regularWhite(6, 2);
 
         // initialize black pieces
-        boardSpots[1][5] = SpotFactory.regularBlack(1, 5);
-        boardSpots[3][5] = SpotFactory.regularBlack(3, 5);
-        boardSpots[5][5] = SpotFactory.regularBlack(5, 5);
-        boardSpots[7][5] = SpotFactory.regularBlack(7, 5);
-        boardSpots[0][6] = SpotFactory.regularBlack(0, 6);
-        boardSpots[2][6] = SpotFactory.regularBlack(2, 6);
-        boardSpots[4][6] = SpotFactory.regularBlack(4, 6);
-        boardSpots[6][6] = SpotFactory.regularBlack(6, 6);
-        boardSpots[1][7] = SpotFactory.regularBlack(1, 7);
-        boardSpots[3][7] = SpotFactory.regularBlack(3, 7);
-        boardSpots[5][7] = SpotFactory.regularBlack(5, 7);
-        boardSpots[7][7] = SpotFactory.regularBlack(7, 7);
+        boardSpots[1][5] = regularBlack(new Point(1, 5));
+        boardSpots[3][5] = regularBlack(new Point(3, 5));
+        boardSpots[5][5] = regularBlack(new Point(5, 5));
+        boardSpots[7][5] = regularBlack(new Point(7, 5));
+        boardSpots[0][6] = regularBlack(new Point(0, 5));
+        boardSpots[2][6] = regularBlack(new Point(2, 5));
+        boardSpots[4][6] = regularBlack(new Point(4, 5));
+        boardSpots[6][6] = regularBlack(new Point(6, 5));
+        boardSpots[1][7] = regularBlack(new Point(1, 5));
+        boardSpots[3][7] = regularBlack(new Point(3, 5));
+        boardSpots[5][7] = regularBlack(new Point(5, 5));
+        boardSpots[7][7] = regularBlack(new Point(7, 5));
+//        boardSpots[3][5] = regularBlack(3, 5);
+//        boardSpots[5][5] = regularBlack(5, 5);
+//        boardSpots[7][5] = regularBlack(7, 5);
+//        boardSpots[0][6] = regularBlack(0, 6);
+//        boardSpots[2][6] = regularBlack(2, 6);
+//        boardSpots[4][6] = regularBlack(4, 6);
+//        boardSpots[6][6] = regularBlack(6, 6);
+//        boardSpots[1][7] = regularBlack(1, 7);
+//        boardSpots[3][7] = regularBlack(3, 7);
+//        boardSpots[5][7] = regularBlack(5, 7);
+//        boardSpots[7][7] = regularBlack(7, 7);
 
         // initialize empty spots
-        boardSpots[1][3] = SpotFactory.emptySpot(1, 3);
-        boardSpots[3][3] = SpotFactory.emptySpot(3, 3);
-        boardSpots[5][3] = SpotFactory.emptySpot(5, 3);
-        boardSpots[7][3] = SpotFactory.emptySpot(7, 3);
-        boardSpots[0][4] = SpotFactory.emptySpot(0, 4);
-        boardSpots[2][4] = SpotFactory.emptySpot(2, 4);
-        boardSpots[4][4] = SpotFactory.emptySpot(4, 4);
-        boardSpots[6][4] = SpotFactory.emptySpot(6, 4);
+        boardSpots[1][3] = emptySpot(new Point(1, 3));
+        boardSpots[3][3] = emptySpot(new Point(3, 3));
+        boardSpots[5][3] = emptySpot(new Point(5, 3));
+        boardSpots[7][3] = emptySpot(new Point(7, 3));
+        boardSpots[0][4] = emptySpot(new Point(0, 4));
+        boardSpots[2][4] = emptySpot(new Point(2, 4));
+        boardSpots[4][4] = emptySpot(new Point(4, 4));
+        boardSpots[6][4] = emptySpot(new Point(6, 4));
+//        boardSpots[3][3] = emptySpot(3, 3);
+//        boardSpots[5][3] = emptySpot(5, 3);
+//        boardSpots[7][3] = emptySpot(7, 3);
+//        boardSpots[0][4] = emptySpot(0, 4);
+//        boardSpots[2][4] = emptySpot(2, 4);
+//        boardSpots[4][4] = emptySpot(4, 4);
+//        boardSpots[6][4] = emptySpot(6, 4);
 
     }
 

@@ -1,6 +1,8 @@
 package checkers.logic.piece;
 
 import checkers.logic.board.Board;
+import checkers.logic.board.Point;
+import checkers.logic.board.Spot;
 import checkers.logic.board.SpotFactory;
 import checkers.logic.game.GameStatusModule;
 import checkers.logic.player.Player;
@@ -39,13 +41,14 @@ public class RegularPiece extends Piece {
     public void advancePiece(GameStatusModule gameStatusModule) throws Exception {
         Board board = gameStatusModule.getBoard();
         Player player = gameStatusModule.getPlayer();
+        Point point = gameStatusModule.getEndSpot().getPoint();
         int x = gameStatusModule.getStartSpot().getPoint().getX();
         int y = gameStatusModule.getStartSpot().getPoint().getY();
         if (board.getPiece(gameStatusModule).isRegular()) {
             if (y == 7 && player.isWhite()) {
-                board.setBoardSpot(x, y, SpotFactory.uberWhite(x, y));
+                board.setBoardSpot(x, y, SpotFactory.uberWhite(point));
             } else if (y == 0 && player.isBlack()) {
-                board.setBoardSpot(x, y, SpotFactory.uberBlack(x, y));
+                board.setBoardSpot(x, y, SpotFactory.uberBlack(point));
             }
         }
     }
@@ -54,6 +57,7 @@ public class RegularPiece extends Piece {
     public boolean hasMove(GameStatusModule gameStatusModule) throws Exception {
         Board board = gameStatusModule.getBoard();
         Player player = gameStatusModule.getPlayer();
+        Point point = gameStatusModule.getStartSpot().getPoint();
         int startX = gameStatusModule.getStartSpot().getPoint().getX();
         int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if (player.isWhite()) {
@@ -75,23 +79,23 @@ public class RegularPiece extends Piece {
                 } else {
                     System.out.println("No move available!");
                 }
-            } else if (startX == 0 && (board.hasPiece(startX + 1, startY - 1))) {
+            } else if (startX == 0 && (board.hasPiece(point.getPoint(1, -1)))) {
                 if (hasKill(gameStatusModule)) {
                     return true;
                 } else {
                     System.out.println("No move available!");
                 }
-            } else if (startX == 7 && (board.hasPiece(startX - 1, startY - 1))) {
+            } else if (startX == 7 && (board.hasPiece(point.getPoint(-1, -1)))) {
                 if (hasKill(gameStatusModule)) {
                     return true;
                 } else {
                     System.out.println("No move available");
                 }
-            } else if (startX == 7 && (board.hasNoPiece(startX - 1, startY - 1))) {
+            } else if (startX == 7 && (board.hasNoPiece(point.getPoint(-1, -1)))) {
                 return true;
             } else if ((startX > 0 && startX < 7) &&
-                    board.hasPiece(startX + 1, startY - 1) &&
-                    board.hasPiece(startX - 1, startY - 1)) {
+                    board.hasPiece(point.getPoint(1, -1)) &&
+                    board.hasPiece(point.getPoint(-1, -1))) {
                 if (hasKill(gameStatusModule)) {
                     return true;
                 }
@@ -122,13 +126,12 @@ public class RegularPiece extends Piece {
     public boolean upLeftKill(GameStatusModule gameStatusModule) throws Exception {
         Board board = gameStatusModule.getBoard();
         Player player = gameStatusModule.getPlayer();
-        int startX = gameStatusModule.getStartSpot().getPoint().getX();
-        int startY = gameStatusModule.getStartSpot().getPoint().getY();
-        if (board.hasNoPiece(startX - 2, startY + 2)) {
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        if (board.hasNoPiece(point.getPoint(-2, 2))) {
             if (player.isWhite()) {
-                return board.pieceIsBlack(startX - 1, startY + 1);
+                return board.pieceIsBlack(point.getPoint(-1, 1));
             } else {
-                return board.pieceIsWhite(startX - 1, startY + 1);
+                return board.pieceIsWhite(point.getPoint(-1, 1));
             }
         }
         return false;
@@ -138,13 +141,12 @@ public class RegularPiece extends Piece {
     public boolean upRightKill(GameStatusModule gameStatusModule) throws Exception {
         Board board = gameStatusModule.getBoard();
         Player player = gameStatusModule.getPlayer();
-        int startX = gameStatusModule.getStartSpot().getPoint().getX();
-        int startY = gameStatusModule.getStartSpot().getPoint().getY();
-        if (board.hasNoPiece(startX + 2, startY + 2)) {
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        if (board.hasNoPiece(point.getPoint(2, 2))) {
             if (player.isWhite()) {
-                return board.pieceIsBlack(startX + 1, startY + 1);
+                return board.pieceIsBlack(point.getPoint(1, 1));
             } else {
-                return board.pieceIsWhite(startX + 1, startY + 1);
+                return board.pieceIsWhite(point.getPoint(1, 1));
             }
         }
         return false;
@@ -154,13 +156,12 @@ public class RegularPiece extends Piece {
     public boolean downLeftKill(GameStatusModule gameStatusModule) throws Exception {
         Board board = gameStatusModule.getBoard();
         Player player = gameStatusModule.getPlayer();
-        int startX = gameStatusModule.getStartSpot().getPoint().getX();
-        int startY = gameStatusModule.getStartSpot().getPoint().getY();
-        if (board.hasNoPiece(startX - 2, startY - 2)) {
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        if (board.hasNoPiece(point.getPoint(-2, -2))) {
             if (player.isWhite()) {
-                return board.pieceIsBlack(startX - 1, startY - 1);
+                return board.pieceIsBlack(point.getPoint(-1, -1));
             } else {
-                return board.pieceIsWhite(startX - 1, startY - 1);
+                return board.pieceIsWhite(point.getPoint(-1, -1));
             }
         }
         return false;
@@ -170,13 +171,12 @@ public class RegularPiece extends Piece {
     public boolean downRightKill(GameStatusModule gameStatusModule) throws Exception {
         Board board = gameStatusModule.getBoard();
         Player player = gameStatusModule.getPlayer();
-        int startX = gameStatusModule.getStartSpot().getPoint().getX();
-        int startY = gameStatusModule.getStartSpot().getPoint().getY();
-        if (board.hasNoPiece(startX + 2, startY - 2)) {
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        if (board.hasNoPiece(point.getPoint(2, -2))) {
             if (player.isWhite()) {
-                return board.pieceIsBlack(startX + 1, startY - 1);
+                return board.pieceIsBlack(point.getPoint(1, -1));
             } else {
-                return board.pieceIsWhite(startX + 1, startY - 1);
+                return board.pieceIsWhite(point.getPoint(1, -1));
             }
         }
         return false;
@@ -277,35 +277,36 @@ public class RegularPiece extends Piece {
     public boolean killEnemyPiece(GameStatusModule gameStatusModule) throws Exception {
         Board board = gameStatusModule.getBoard();
         Player player = gameStatusModule.getPlayer();
+        Point startPoint = gameStatusModule.getStartSpot().getPoint();
         int startX = gameStatusModule.getStartSpot().getPoint().getX();
         int startY = gameStatusModule.getStartSpot().getPoint().getY();
         int endX = gameStatusModule.getEndSpot().getPoint().getX();
         int endY = gameStatusModule.getEndSpot().getPoint().getY();
         if (player.isWhite()) {
-            if (startX - 2 == endX && startY + 2 == endY && board.pieceIsBlack(startX - 1, startY + 1)) {
+            if (startX - 2 == endX && startY + 2 == endY && board.pieceIsBlack(startPoint.getPoint(-1, 1))) {
                 board.setBoardPieceNull(startX - 1, startY + 1);
                 return true;
-            } else if ((startX + 2 == endX && startY + 2 == endY) && board.pieceIsBlack(startX + 1, startY + 1)) {
+            } else if ((startX + 2 == endX && startY + 2 == endY) && board.pieceIsBlack(startPoint.getPoint(1, 1))) {
                 board.setBoardPieceNull(startX + 1, startY + 1);
                 return true;
-            } else if ((startX - 2 == endX && startY - 2 == endY) && board.pieceIsBlack(startX - 1, startY - 1)) {
+            } else if ((startX - 2 == endX && startY - 2 == endY) && board.pieceIsBlack(startPoint.getPoint(-1, -1))) {
                 board.setBoardPieceNull(startX - 1, startY - 1);
                 return true;
-            } else if ((startX + 2 == endX && startY - 2 == endY) && board.pieceIsBlack(startX + 1, startY - 1)) {
+            } else if ((startX + 2 == endX && startY - 2 == endY) && board.pieceIsBlack(startPoint.getPoint(1, -1))) {
                 board.setBoardPieceNull(startX + 1, startY - 1);
                 return true;
             }
         } else if (!player.isWhite()) {
-            if (startX - 2 == endX && startY + 2 == endY && board.pieceIsWhite(startX - 1, startY + 1)) {
+            if (startX - 2 == endX && startY + 2 == endY && board.pieceIsWhite(startPoint.getPoint(-1, 1))) {
                 board.setBoardPieceNull(startX - 1, startY + 1);
                 return true;
-            } else if ((startX + 2 == endX && startY + 2 == endY) && board.pieceIsWhite(startX + 1, startY + 1)) {
+            } else if ((startX + 2 == endX && startY + 2 == endY) && board.pieceIsWhite(startPoint.getPoint(1, 1))) {
                 board.setBoardPieceNull(startX + 1, startY + 1);
                 return true;
-            } else if ((startX - 2 == endX && startY - 2 == endY) && board.pieceIsWhite(startX - 1, startY - 1)) {
+            } else if ((startX - 2 == endX && startY - 2 == endY) && board.pieceIsWhite(startPoint.getPoint(-1, -1))) {
                 board.setBoardPieceNull(startX - 1, startY - 1);
                 return true;
-            } else if ((startX + 2 == endX && startY - 2 == endY) && board.pieceIsWhite(startX + 1, startY - 1)) {
+            } else if ((startX + 2 == endX && startY - 2 == endY) && board.pieceIsWhite(startPoint.getPoint(1, -1))) {
                 board.setBoardPieceNull(startX + 1, startY - 1);
                 return true;
             }

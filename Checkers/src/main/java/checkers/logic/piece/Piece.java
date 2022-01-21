@@ -45,32 +45,39 @@ public abstract class Piece {
 
     public boolean upLeftMove(GameStatusModule gameStatusModule) throws Exception {
         Board board = gameStatusModule.getBoard();
-        int startX =
-        return (board.hasNoPiece(startX - 1, startY + 1));
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        return (board.hasNoPiece(point.getPoint(-1, 1)));
     }
 
-    public boolean upRightMove(Board board, int startX, int startY) throws Exception {
-        return (board.hasNoPiece(startX + 1, startY + 1));
+    public boolean upRightMove(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        return (board.hasNoPiece(point.getPoint(1, 1)));
+
     }
 
-    public boolean downLeftMove(Board board, int startX, int startY) throws Exception {
-        return (board.hasNoPiece(startX - 1, startY - 1));
+    public boolean downLeftMove(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        return (board.hasNoPiece(point.getPoint(-1, -1)));
     }
 
-    public boolean downRightMove(Board board, int startX, int startY) throws Exception {
-        return (board.hasNoPiece(startX + 1, startY - 1));
+    public boolean downRightMove(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        return (board.hasNoPiece(point.getPoint(1, -1)));
     }
 
-    public boolean validateExceptionsMoves(Board board, int startX, int startY) {
+    public boolean validateExceptionsMoves(GameStatusModule gameStatusModule) {
         return false;
     }
 
     public boolean validateCenterMoves(GameStatusModule gameStatusModule) throws Exception {
-        Board board = game.board;
-        int startX = game.startX;
-        int startY = game.startY;
-        if (board.hasPiece(startX + 1, startY + 1) && board.hasPiece(startX - 1, startY + 1)) {
-            if (hasKill(game)) {
+        Board board = gameStatusModule.getBoard();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+
+        if (board.hasPiece(point.getPoint(1, 1)) && board.hasPiece(point.getPoint(-1, 1))) {
+            if (hasKill(gameStatusModule)) {
                 return true;
             } else {
                 System.out.println("No move available!");
@@ -80,14 +87,15 @@ public abstract class Piece {
     }
 
     public boolean validateLeftMoves(GameStatusModule gameStatusModule) throws Exception {
-        Board board = game.board;
-        int startX = game.startX;
-        int startY = game.startY;
-        if (startX == 0 && board.hasNoPiece(startX + 1, startY + 1)) {
+        Board board = gameStatusModule.getBoard();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
+        if (startX == 0 && board.hasNoPiece(point.getPoint(1, 1))) {
             return true;
         }
-        if (startX == 0 && board.hasPiece(startX + 1, startY + 1)) {
-            if (hasKill(game)) {
+        if (startX == 0 && board.hasPiece(point.getPoint(1, 1))) {
+            if (hasKill(gameStatusModule)) {
                 return true;
             } else {
                 System.out.println("No move available!");
@@ -97,14 +105,16 @@ public abstract class Piece {
     }
 
     public boolean validateRightMoves(GameStatusModule gameStatusModule) throws Exception {
-        Board board = game.board;
-        int startX = game.startX;
-        int startY = game.startY;
-        if (startX == 7 && (board.hasNoPiece(startX - 1, startY + 1))) {
+        Board board = gameStatusModule.getBoard();
+        Point point = gameStatusModule.getStartSpot().getPoint();
+
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
+        if (startX == 7 && (board.hasNoPiece(point.getPoint(-1, 1)))) {
             return true;
         }
-        if (startX == 7 && board.hasPiece(startX - 1, startY + 1)) {
-            if (hasKill(game)) {
+        if (startX == 7 && board.hasPiece(point.getPoint(-1, 1))) {
+            if (hasKill(gameStatusModule)) {
                 return true;
             } else {
                 System.out.println("No move available!");

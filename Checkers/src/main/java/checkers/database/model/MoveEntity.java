@@ -26,8 +26,8 @@ public class MoveEntity {
     public MoveEntity (Game game) {
         this.moveNumber = game.getMoveCounter();
         this.playerName = game.getCurrentPlayer().getName();
-        this.startSpot = game.getStartSpot();
-        this.endSpot = game.getEndSpot();
+        this.startSpot = game.getGameStatusModule().getStartSpot().toString();
+        this.endSpot = game.getGameStatusModule().getEndSpot().toString();
         this.isWhite = game.getCurrentPlayer().isWhite();
     }
 }

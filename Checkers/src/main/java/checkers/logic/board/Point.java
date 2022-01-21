@@ -9,4 +9,8 @@ import lombok.*;
 public class Point {
     int x;
     int y;
+
+    public Point getPoint(int xChange, int yChange) {
+        return new Point(x + xChange, y + getY());
+    }
 }

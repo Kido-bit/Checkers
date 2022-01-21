@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -134,14 +135,14 @@ public class Game {
         for (Move move : moves) {
             String startInput = move.getStart();
             String startSpotXY = convertPlayerInput(startInput);
-            startX = Integer.parseInt(String.valueOf(startSpotXY.charAt(0)));
-            startY = Integer.parseInt(String.valueOf(startSpotXY.charAt(1))) - 1;
+            int startX = Integer.parseInt(String.valueOf(startSpotXY.charAt(0)));
+            int startY = Integer.parseInt(String.valueOf(startSpotXY.charAt(1))) - 1;
             Point startPoint = new Point(startX, startY);
 
             String endInput = move.getEnd();
             String endSpotXY = convertPlayerInput(endInput);
-            endX = Integer.parseInt(String.valueOf(endSpotXY.charAt(0)));
-            endY = Integer.parseInt(String.valueOf(endSpotXY.charAt(1))) - 1;
+            int endX = Integer.parseInt(String.valueOf(endSpotXY.charAt(0)));
+            int endY = Integer.parseInt(String.valueOf(endSpotXY.charAt(1))) - 1;
             Point endPoint = new Point(endX, endY);
 
             board.getBoardSpot(endPoint);
@@ -195,30 +196,30 @@ public class Game {
         return String.valueOf(charX - 97) + charY;
     }
 
-    private void parseInputXY(String input) {
-        spotX = Integer.parseInt(String.valueOf(input.charAt(0)));
-        spotY = Integer.parseInt(String.valueOf(input.charAt(1))) - 1;
+    private Point parseInputXY(String input) {
+        Point point = new Point();
+        point.setX(Integer.parseInt(String.valueOf(input.charAt(0))));
+        point.setX(Integer.parseInt(String.valueOf(input.charAt(1))) - 1);
+        return point;
     }
 
     public void getSpot(boolean isStartSpot) throws Exception {
         String stringSpotXY;
+        Point point;
         boolean isSpotValid;
         do {
             if (isStartSpot) {
                 System.out.println("Which checker to move?");
                 String startInput = getPlayerInput();
                 stringSpotXY = convertPlayerInput(startInput);
-                parseInputXY(stringSpotXY);
-                int startX = stringSpotXY.charAt(0);
-                int startY = stringSpotXY.charAt(1);
             } else {
                 System.out.println("Where to go?");
-                endSpot = getPlayerInput();
+                String endSpot = getPlayerInput();
                 stringSpotXY = convertPlayerInput(endSpot);
-                parseInputXY(stringSpotXY);
-                endX = spotX;
-                endY = spotY;
             }
+            point = parseInputXY(stringSpotXY);
+            int startX = point.getX();
+            int startY = point.getY();
             if (isStartSpot) {
                 isSpotValid = Spot.validateStartSpot(gameStatusModule);
             } else {
@@ -237,24 +238,23 @@ public class Game {
             // Choosing where to move
             getSpot(false);
             // Making move
-            if (Spot.isEndSpotValid(this)) {
-                board.setSpotsAfterMove(this);
-                board.getPiece(actualTurn).advancePiece(this);
+            if (Spot.isEndSpotValid(gameStatusModule)) {
+                board.setSpotsAfterMove(gameStatusModule);
+                board.getPiece(actualTurn).advancePiece(gameStatusModule);
                 moveDao.add(new MoveEntity(this));
                 getBoard().printBoard();
                 break;
                 // Making kill
-            } else if (board.getStartPiece(actualTurn).hasKill(this)) {
-                if (board.getStartPiece(actualTurn).killEnemyPiece(this)) {
+            } else if (board.getStartPiece(actualTurn).hasKill(gameStatusModule)) {
+                if (board.getStartPiece(actualTurn).killEnemyPiece(gameStatusModule)) {
                     currentPlayer.killCounter();
-                    board.setSpotsAfterMove(this);
-                    board.getPiece(endX, endY).advancePiece(this);
+                    board.setSpotsAfterMove(gameStatusModule);
+                    board.getPiece(gameStatusModule).advancePiece(gameStatusModule);
                     getBoard().printBoard();
-                    startX = endX;
-                    startY = endY;
+                    gameStatusModule.setStartSpot(gameStatusModule.getEndSpot());
                     moveDao.add(new MoveEntity(this));
-                    if (board.getStartPiece(this).hasKill(this)) {
-                        startSpot = endSpot;
+                    if (board.getStartPiece(gameStatusModule).hasKill(gameStatusModule)) {
+                        gameStatusModule.setStartSpot(gameStatusModule.getEndSpot());
                         System.out.println("Another kill!");
                     } else {
                         break;

@@ -1,6 +1,5 @@
 package checkers.logic.board;
 
-import checkers.logic.game.Game;
 import checkers.logic.game.GameStatusModule;
 import checkers.logic.piece.Piece;
 import checkers.logic.player.Player;
@@ -30,11 +29,11 @@ public class Spot {
         Board board = gameStatusModule.getBoard();
         Player player = gameStatusModule.getPlayer();
         Point point = gameStatusModule.getStartSpot().getPoint();
-        if (board.isEmpty(point.getX(), point.getY())) {
+        if (board.isEmpty(point)) {
             System.out.println("Invalid board spot!");
-        } else if (board.hasNoPiece(point.getX(), point.getY())) {
+        } else if (board.hasNoPiece(point)) {
             System.out.println("No checker here!");
-        } else if ((player.isWhite() && board.pieceIsBlack(point.getX(), point.getY())) || (player.isBlack()) && board.pieceIsWhite(point.getX(), point.getY())) {
+        } else if ((player.isWhite() && board.pieceIsBlack(point)) || (player.isBlack()) && board.pieceIsWhite(point)) {
             System.out.println("Not your checker!");
         } else return board.getStartPiece(gameStatusModule).hasMove(gameStatusModule);
         return false;
@@ -42,12 +41,11 @@ public class Spot {
 
     public static boolean validateEndSpot(GameStatusModule gameStatusModule) throws Exception {
         Board board = gameStatusModule.getBoard();
-        int endX = gameStatusModule.getEndSpot().getPoint().getX();
-        int endY = gameStatusModule.getEndSpot().getPoint().getY();
-        if (board.isEmpty(endX, endY)) {
+        Point point = gameStatusModule.getEndSpot().getPoint();
+        if (board.isEmpty(point)) {
             System.out.println("Invalid board spot!");
             return false;
-        } else if (board.hasPiece(endX, endY)) {
+        } else if (board.hasPiece(point)) {
             System.out.println("Checker on spot!");
             return false;
         }
