@@ -55,28 +55,5 @@ public class Menu {
     public static void mainMenu() throws Exception {
         printLogo();
         printOptions();
-        int menuOption = Menu.getOptionInput();
-        Game game = new Game();
-
-        switch (menuOption) {
-            case 1:
-                game.newGame();
-                while (game.isActive()) {
-                    game.makeMove();
-                }
-                System.out.println(game.getCurrentPlayer().getName() + " has won the game!");
-                break;
-            case 2:
-                game.continueGame();
-                while (game.isActive()) {
-                    game.makeMove();
-                }
-                System.out.println(game.getCurrentPlayer().getName() + " has won the game!");
-                break;
-            case 3:
-                return;
-            default:
-                throw new IllegalStateException("Unexpected value: " + menuOption);
-        }
     }
 }

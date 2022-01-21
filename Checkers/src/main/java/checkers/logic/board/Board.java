@@ -1,9 +1,13 @@
 package checkers.logic.board;
 
 import checkers.logic.game.Game;
+import checkers.logic.game.GameStatusModule;
 import checkers.logic.piece.Piece;
 import checkers.logic.player.Player;
 import lombok.*;
+
+import java.awt.event.MouseEvent;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -12,20 +16,23 @@ public class Board {
 
     private final static int BOARD_SIDE_SIZE = 8;
     private Spot[][] boardSpots = new Spot[BOARD_SIDE_SIZE][BOARD_SIDE_SIZE];
+    private Spot boardSpot;
 
-    public Spot getBoardSpot(int x, int y) throws Exception {
+    public Spot getBoardSpot(Point point) throws Exception {
+        int x = point.getX();
+        int y = point.getY();
         if (x < 0 || x > 7 || y < 0 || y > 7) {
             throw new Exception("Space is out of bounds");
         }
         return boardSpots[x][y];
     }
 
-    public Piece getStartPiece(Game game) throws Exception {
-        return getBoardSpot(game.startX, game.startY).getPiece();
+    public Piece getStartPiece(GameStatusModule gameStatusModule) throws Exception {
+        return gameStatusModule.getStartSpot().getPiece();
     }
 
-    public Piece getPiece(int x, int y) throws Exception {
-        return getBoardSpot(x, y).getPiece();
+    public Piece getPiece(GameStatusModule gameStatusModule) throws Exception {
+        return gameStatusModule.getEndSpot().getPiece();
     }
 
     public void advancePiece(Game game) throws Exception {
@@ -135,4 +142,5 @@ public class Board {
         boardSpots[6][4] = SpotFactory.emptySpot(6, 4);
 
     }
+
 }

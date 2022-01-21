@@ -5,6 +5,7 @@ import checkers.database.dao.PlayerDao;
 import checkers.database.model.MoveEntity;
 import checkers.database.model.PlayerEntity;
 import checkers.logic.board.Board;
+import checkers.logic.board.Point;
 import checkers.logic.board.Spot;
 import checkers.logic.player.Move;
 import checkers.logic.player.Player;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class Game {
 
+    private GameStatusModule gameStatusModule;
     private List<Player> players;
     public Board board;
     public Player currentPlayer;
@@ -36,49 +38,46 @@ public class Game {
     private HibernateFactory hibernateFactory = new HibernateFactory();
     private PlayerDao playerDao = new PlayerDao(hibernateFactory);
     private MoveDao moveDao = new MoveDao(hibernateFactory);
-    private String startSpot;
-    private String endSpot;
-    public int spotX;
-    public int spotY;
-    public int startX;
-    public int startY;
-    public int endX;
-    public int endY;
-
-    public Game getGame() {
-        return this;
-    }
 
     public void runGame() throws Exception {
+        Game game = new Game();
         Menu.mainMenu();
+        int menuOption = Menu.getOptionInput();
+        switch (menuOption) {
+            case 1:
+                game.newGame();
+                while (game.isActive()) {
+                    game.makeMove();
+                }
+                System.out.println(game.getCurrentPlayer().getName() + " has won the game!");
+                break;
+            case 2:
+                game.continueGame();
+                while (game.isActive()) {
+                    game.makeMove();
+                }
+                System.out.println(game.getCurrentPlayer().getName() + " has won the game!");
+                break;
+            case 3:
+                return;
+            default:
+                throw new IllegalStateException("Unexpected value: " + menuOption);
+        }
     }
 
     public List<Player> createPlayers() {
         players = new ArrayList<>();
 
-        while (true) {
-            System.out.println("Enter White Player name:");
-            Player whitePlayer = new Player(Player.whitePlayerName = scanner.nextLine(), true, 0);
-            if (playerDao.getByName(whitePlayer.getName()).isEmpty()) {
-                players.add(whitePlayer);
-                playerDao.add(new PlayerEntity(whitePlayer));
-                break;
-            } else {
-                System.out.println("Player already in Data Base!");
-            }
-        }
-        while (true) {
-            System.out.println("Enter Black Player name:");
-            Player blackPlayer = new Player(Player.blackPlayerName = scanner.nextLine(), false, 0);
-            if (playerDao.getByName(blackPlayer.getName()).isEmpty()) {
-                players.add(blackPlayer);
-                playerDao.add(new PlayerEntity(blackPlayer));
-                break;
-            } else {
-                System.out.println("Player already in Data Base!");
-            }
-        }
-        playerDao.getAll().forEach(System.out::println);
+        System.out.println("Enter White Player name:");
+        Player whitePlayer = new Player(Player.whitePlayerName = scanner.nextLine(), true, 0);
+        players.add(whitePlayer);
+        playerDao.add(new PlayerEntity(whitePlayer));
+
+        System.out.println("Enter Black Player name:");
+        Player blackPlayer = new Player(Player.blackPlayerName = scanner.nextLine(), false, 0);
+        players.add(blackPlayer);
+        playerDao.add(new PlayerEntity(blackPlayer));
+
         return players;
     }
 
@@ -137,24 +136,26 @@ public class Game {
             String startSpotXY = convertPlayerInput(startInput);
             startX = Integer.parseInt(String.valueOf(startSpotXY.charAt(0)));
             startY = Integer.parseInt(String.valueOf(startSpotXY.charAt(1))) - 1;
+            Point startPoint = new Point(startX, startY);
 
             String endInput = move.getEnd();
             String endSpotXY = convertPlayerInput(endInput);
             endX = Integer.parseInt(String.valueOf(endSpotXY.charAt(0)));
             endY = Integer.parseInt(String.valueOf(endSpotXY.charAt(1))) - 1;
+            Point endPoint = new Point(endX, endY);
 
-            board.getBoardSpot(endX, endY);
-            if (Spot.isEndSpotValid(this)) {
-                board.setSpotsAfterMove(this);
-                board.advancePiece(this);
-            } else if (board.getStartPiece(this).hasKill(this)) {
-                if (board.getStartPiece(this).killEnemyPiece(this)) {
+            board.getBoardSpot(endPoint);
+            if (Spot.isEndSpotValid(gameStatusModule)) {
+                board.setSpotsAfterMove(gameStatusModule);
+                board.advancePiece(gameStatusModule);
+            } else if (board.getStartPiece(gameStatusModule).hasKill(gameStatusModule)) {
+                if (board.getStartPiece(gameStatusModule).killEnemyPiece(gameStatusModule)) {
                     currentPlayer.killCounter();
-                    board.setSpotsAfterMove(this);
-                    board.advancePiece(this);
+                    board.setSpotsAfterMove(gameStatusModule);
+                    board.advancePiece(gameStatusModule);
                     startX = endX;
                     startY = endY;
-                    if (board.getStartPiece(this).hasKill(this)) {
+                    if (board.getStartPiece(gameStatusModule).hasKill(gameStatusModule)) {
                         continue;
                     }
                 }
@@ -205,11 +206,11 @@ public class Game {
         do {
             if (isStartSpot) {
                 System.out.println("Which checker to move?");
-                startSpot = getPlayerInput();
-                stringSpotXY = convertPlayerInput(startSpot);
+                String startInput = getPlayerInput();
+                stringSpotXY = convertPlayerInput(startInput);
                 parseInputXY(stringSpotXY);
-                startX = spotX;
-                startY = spotY;
+                int startX = stringSpotXY.charAt(0);
+                int startY = stringSpotXY.charAt(1);
             } else {
                 System.out.println("Where to go?");
                 endSpot = getPlayerInput();
@@ -219,15 +220,16 @@ public class Game {
                 endY = spotY;
             }
             if (isStartSpot) {
-                isSpotValid = Spot.validateStartSpot(this);
+                isSpotValid = Spot.validateStartSpot(gameStatusModule);
             } else {
-                isSpotValid = Spot.validateEndSpot(board, spotX, spotY);
+                isSpotValid = Spot.validateEndSpot(gameStatusModule);
             }
         } while (!isSpotValid);
     }
 
     public void makeMove() throws Exception {
 
+        GameStatusModule actualTurn = new GameStatusModule(this);
         System.out.println(currentPlayer.getName() + " move.");
         // Choosing checker to move
         getSpot(true);
@@ -237,13 +239,13 @@ public class Game {
             // Making move
             if (Spot.isEndSpotValid(this)) {
                 board.setSpotsAfterMove(this);
-                board.getPiece(endX, endY).advancePiece(this);
+                board.getPiece(actualTurn).advancePiece(this);
                 moveDao.add(new MoveEntity(this));
                 getBoard().printBoard();
                 break;
                 // Making kill
-            } else if (board.getStartPiece(this).hasKill(this)) {
-                if (board.getStartPiece(this).killEnemyPiece(this)) {
+            } else if (board.getStartPiece(actualTurn).hasKill(this)) {
+                if (board.getStartPiece(actualTurn).killEnemyPiece(this)) {
                     currentPlayer.killCounter();
                     board.setSpotsAfterMove(this);
                     board.getPiece(endX, endY).advancePiece(this);

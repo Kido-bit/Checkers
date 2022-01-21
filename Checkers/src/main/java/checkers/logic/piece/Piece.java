@@ -1,7 +1,9 @@
 package checkers.logic.piece;
 
 import checkers.logic.board.Board;
+import checkers.logic.board.Point;
 import checkers.logic.game.Game;
+import checkers.logic.game.GameStatusModule;
 import checkers.logic.player.Player;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,16 +34,18 @@ public abstract class Piece {
 
     public abstract boolean isRegular();
 
-    public abstract boolean hasMove(Game game) throws Exception;
+    public abstract boolean hasMove(GameStatusModule gameStatusModule) throws Exception;
 
-    public boolean hasKill(Game game) throws Exception {
+    public boolean hasKill(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public void advancePiece(Game game) throws Exception {
+    public void advancePiece(GameStatusModule gameStatusModule) throws Exception {
     }
 
-    public boolean upLeftMove(Board board, int startX, int startY) throws Exception {
+    public boolean upLeftMove(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        int startX =
         return (board.hasNoPiece(startX - 1, startY + 1));
     }
 
@@ -61,7 +65,7 @@ public abstract class Piece {
         return false;
     }
 
-    public boolean validateCenterMoves(Game game) throws Exception {
+    public boolean validateCenterMoves(GameStatusModule gameStatusModule) throws Exception {
         Board board = game.board;
         int startX = game.startX;
         int startY = game.startY;
@@ -75,7 +79,7 @@ public abstract class Piece {
             return false;
     }
 
-    public boolean validateLeftMoves(Game game) throws Exception {
+    public boolean validateLeftMoves(GameStatusModule gameStatusModule) throws Exception {
         Board board = game.board;
         int startX = game.startX;
         int startY = game.startY;
@@ -92,7 +96,7 @@ public abstract class Piece {
         return false;
     }
 
-    public boolean validateRightMoves(Game game) throws Exception {
+    public boolean validateRightMoves(GameStatusModule gameStatusModule) throws Exception {
         Board board = game.board;
         int startX = game.startX;
         int startY = game.startY;
@@ -113,59 +117,59 @@ public abstract class Piece {
         return false;
     }
 
-    public boolean validateBottomMoves(Game game) throws Exception {
+    public boolean validateBottomMoves(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean upLeftKill(Game game) throws Exception {
+    public boolean upLeftKill(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean upRightKill(Game game) throws Exception {
+    public boolean upRightKill(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean downLeftKill(Game game) throws Exception {
+    public boolean downLeftKill(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean downRightKill(Game game) throws Exception {
+    public boolean downRightKill(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean validateExceptionsKilling(Game game) throws Exception {
+    public boolean validateExceptionsKilling(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean validateCenterKilling(Game game) throws Exception {
+    public boolean validateCenterKilling(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean validateLeftSideKilling(Game game) throws Exception {
+    public boolean validateLeftSideKilling(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean validateRightSideKilling(Game game) throws Exception {
+    public boolean validateRightSideKilling(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean validateTopKilling(Game game) throws Exception {
+    public boolean validateTopKilling(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean validateBottomKilling(Game game) throws Exception {
+    public boolean validateBottomKilling(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public boolean killEnemyPiece(Game game) throws Exception {
+    public boolean killEnemyPiece(GameStatusModule gameStatusModule) throws Exception {
         return false;
     }
 
-    public List<String> possiblePrimaryMoves(Game game) throws Exception {
+    public List<String> possiblePrimaryMoves(GameStatusModule gameStatusModule) throws Exception {
         return new ArrayList<>();
     }
 
-    public Map<String, String> possibleKills(Game game) throws Exception {
+    public Map<String, String> possibleKills(GameStatusModule gameStatusModule) throws Exception {
         return new HashMap<>();
     }
 }

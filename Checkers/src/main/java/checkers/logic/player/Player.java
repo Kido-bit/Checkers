@@ -30,12 +30,16 @@ public class Player {
         kills += 1;
     }
 
+    public String getPlayerColor(Player player) {
+        return player.isWhite ? "White" : "Black";
+    }
+
     public boolean isBlack() {
         return !isWhite;
     }
 
     public Player switchPlayers(Player player, List<Player> players) {
-        return player.isWhite() ? players.get(1) : players.get(0);
+        return player.isWhite ? players.get(1) : players.get(0);
     }
 
     @Override

@@ -1,7 +1,9 @@
 package checkers.logic.piece;
 
 import checkers.logic.board.Board;
+import checkers.logic.board.Point;
 import checkers.logic.game.Game;
+import checkers.logic.game.GameStatusModule;
 import checkers.logic.player.Player;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,28 +40,28 @@ public class UberPiece extends Piece {
     }
 
     @Override
-    public boolean hasMove(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean hasMove(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if (player.isWhite()) {
             if (board.pieceIsBlack(startX, startY)) {
                 System.out.println("Not your piece!");
                 return false;
             } else {
-                if(!possiblePrimaryMoves(game).isEmpty()) {
+                if(!possiblePrimaryMoves(gameStatusModule).isEmpty()) {
                     return true;
-                } return hasKill(game);
+                } return hasKill(gameStatusModule);
             }
         } else {
             if (board.pieceIsWhite(startX, startY)) {
                 System.out.println("Not your piece!");
                 return false;
             } else {
-                if(!possiblePrimaryMoves(game).isEmpty()) {
+                if(!possiblePrimaryMoves(gameStatusModule).isEmpty()) {
                     return true;
-                } return hasKill(game);
+                } return hasKill(gameStatusModule);
             }
         }
     }

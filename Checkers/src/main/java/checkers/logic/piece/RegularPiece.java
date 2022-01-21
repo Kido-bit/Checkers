@@ -2,7 +2,7 @@ package checkers.logic.piece;
 
 import checkers.logic.board.Board;
 import checkers.logic.board.SpotFactory;
-import checkers.logic.game.Game;
+import checkers.logic.game.GameStatusModule;
 import checkers.logic.player.Player;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,12 +36,12 @@ public class RegularPiece extends Piece {
     }
 
     @Override
-    public void advancePiece(Game game) throws Exception {
-        Board board = game.board;
-        int x = game.endX;
-        int y = game.endY;
-        Player player = game.currentPlayer;
-        if (board.getPiece(x, y).isRegular()) {
+    public void advancePiece(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        int x = gameStatusModule.getStartSpot().getPoint().getX();
+        int y = gameStatusModule.getStartSpot().getPoint().getY();
+        if (board.getPiece(gameStatusModule).isRegular()) {
             if (y == 7 && player.isWhite()) {
                 board.setBoardSpot(x, y, SpotFactory.uberWhite(x, y));
             } else if (y == 0 && player.isBlack()) {
@@ -51,38 +51,38 @@ public class RegularPiece extends Piece {
     }
 
     @Override
-    public boolean hasMove(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean hasMove(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if (player.isWhite()) {
-            if (validateTopKilling(game)) {
+            if (validateTopKilling(gameStatusModule)) {
                 return true;
-            } else if (validateLeftMoves(game)) {
+            } else if (validateLeftMoves(gameStatusModule)) {
                 return true;
-            } else if (validateRightMoves(game)) {
+            } else if (validateRightMoves(gameStatusModule)) {
                 return true;
-            } else if (validateCenterMoves(game)) {
+            } else if (validateCenterMoves(gameStatusModule)) {
                 return true;
             } else {
                 return true;
             }
         } else if (!player.isWhite()) {
             if (startY == 0) {
-                if (hasKill(game)) {
+                if (hasKill(gameStatusModule)) {
                     return true;
                 } else {
                     System.out.println("No move available!");
                 }
             } else if (startX == 0 && (board.hasPiece(startX + 1, startY - 1))) {
-                if (hasKill(game)) {
+                if (hasKill(gameStatusModule)) {
                     return true;
                 } else {
                     System.out.println("No move available!");
                 }
             } else if (startX == 7 && (board.hasPiece(startX - 1, startY - 1))) {
-                if (hasKill(game)) {
+                if (hasKill(gameStatusModule)) {
                     return true;
                 } else {
                     System.out.println("No move available");
@@ -92,7 +92,7 @@ public class RegularPiece extends Piece {
             } else if ((startX > 0 && startX < 7) &&
                     board.hasPiece(startX + 1, startY - 1) &&
                     board.hasPiece(startX - 1, startY - 1)) {
-                if (hasKill(game)) {
+                if (hasKill(gameStatusModule)) {
                     return true;
                 }
                 System.out.println("No move available!");
@@ -104,26 +104,26 @@ public class RegularPiece extends Piece {
     }
 
     @Override
-    public boolean hasKill(Game game) throws Exception {
-        if (validateExceptionsKilling(game)) {
+    public boolean hasKill(GameStatusModule gameStatusModule) throws Exception {
+        if (validateExceptionsKilling(gameStatusModule)) {
             return true;
-        } else if (validateCenterKilling(game)) {
+        } else if (validateCenterKilling(gameStatusModule)) {
             return true;
-        } else if (validateLeftSideKilling(game)) {
+        } else if (validateLeftSideKilling(gameStatusModule)) {
             return true;
-        } else if (validateRightSideKilling(game)) {
+        } else if (validateRightSideKilling(gameStatusModule)) {
             return true;
-        } else if (validateTopKilling(game)) {
+        } else if (validateTopKilling(gameStatusModule)) {
             return true;
-        } else return validateBottomKilling(game);
+        } else return validateBottomKilling(gameStatusModule);
     }
 
     @Override
-    public boolean upLeftKill(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean upLeftKill(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if (board.hasNoPiece(startX - 2, startY + 2)) {
             if (player.isWhite()) {
                 return board.pieceIsBlack(startX - 1, startY + 1);
@@ -135,11 +135,11 @@ public class RegularPiece extends Piece {
     }
 
     @Override
-    public boolean upRightKill(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean upRightKill(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if (board.hasNoPiece(startX + 2, startY + 2)) {
             if (player.isWhite()) {
                 return board.pieceIsBlack(startX + 1, startY + 1);
@@ -151,11 +151,11 @@ public class RegularPiece extends Piece {
     }
 
     @Override
-    public boolean downLeftKill(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean downLeftKill(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if (board.hasNoPiece(startX - 2, startY - 2)) {
             if (player.isWhite()) {
                 return board.pieceIsBlack(startX - 1, startY - 1);
@@ -167,11 +167,11 @@ public class RegularPiece extends Piece {
     }
 
     @Override
-    public boolean downRightKill(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean downRightKill(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if (board.hasNoPiece(startX + 2, startY - 2)) {
             if (player.isWhite()) {
                 return board.pieceIsBlack(startX + 1, startY - 1);
@@ -183,104 +183,104 @@ public class RegularPiece extends Piece {
     }
 
     @Override
-    public boolean validateExceptionsKilling(Game game) throws Exception {
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean validateExceptionsKilling(GameStatusModule gameStatusModule) throws Exception {
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if ((startX == 0 && startY == 0) || (startX == 1 && startY == 1)) {
-            return (upRightKill(game));
+            return (upRightKill(gameStatusModule));
         } else if ((startX == 6 && startY == 0) || (startX == 7 && startY == 1)) {
-            return (upLeftKill(game));
+            return (upLeftKill(gameStatusModule));
         } else if ((startX == 0 && startY == 6) || (startX == 1 && startY == 7)) {
-            return (downRightKill(game));
+            return (downRightKill(gameStatusModule));
         } else if ((startX == 6 && startY == 6) || (startX == 7 && startY == 7)) {
-            return (downLeftKill(game));
+            return (downLeftKill(gameStatusModule));
         }
         return false;
     }
 
     @Override
-    public boolean validateCenterKilling(Game game) throws Exception {
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean validateCenterKilling(GameStatusModule gameStatusModule) throws Exception {
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if (startX > 1 && startY > 1 && startX < 6 && startY < 6) {
-            if (upLeftKill(game)) {
+            if (upLeftKill(gameStatusModule)) {
                 return true;
-            } else if (upRightKill(game)) {
+            } else if (upRightKill(gameStatusModule)) {
                 return true;
-            } else if (downLeftKill(game)) {
+            } else if (downLeftKill(gameStatusModule)) {
                 return true;
             } else {
-                return (downRightKill(game));
+                return (downRightKill(gameStatusModule));
             }
         }
         return false;
     }
 
     @Override
-    public boolean validateLeftSideKilling(Game game) throws Exception {
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean validateLeftSideKilling(GameStatusModule gameStatusModule) throws Exception {
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if ((startX == 0 && (startY == 2 || startY == 4)) || (startX == 1 && (startY == 3 || startY == 5))) {
-            if (upRightKill(game)) {
+            if (upRightKill(gameStatusModule)) {
                 return true;
             } else {
-                return (downRightKill(game));
+                return (downRightKill(gameStatusModule));
             }
         }
         return false;
     }
 
     @Override
-    public boolean validateRightSideKilling(Game game) throws Exception {
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean validateRightSideKilling(GameStatusModule gameStatusModule) throws Exception {
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if ((startX == 7 && (startY == 3 || startY == 5)) || (startX == 6 && (startY == 2 || startY == 4))) {
-            if (upLeftKill(game)) {
+            if (upLeftKill(gameStatusModule)) {
                 return true;
             } else {
-                return (downLeftKill(game));
+                return (downLeftKill(gameStatusModule));
             }
         }
         return false;
     }
 
     @Override
-    public boolean validateTopKilling(Game game) throws Exception {
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean validateTopKilling(GameStatusModule gameStatusModule) throws Exception {
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if ((startY == 7 && (startX == 3 || startX == 5))
                 || (startY == 6 && (startX == 2 || startX == 4))) {
-            if (downLeftKill(game)) {
+            if (downLeftKill(gameStatusModule)) {
                 return true;
             } else {
-                return (downRightKill(game));
+                return (downRightKill(gameStatusModule));
             }
         }
         return false;
     }
 
     @Override
-    public boolean validateBottomKilling(Game game) throws Exception {
-        int startX = game.startX;
-        int startY = game.startY;
+    public boolean validateBottomKilling(GameStatusModule gameStatusModule) throws Exception {
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
         if ((startY == 0 && (startX == 2 || startX == 4)) || (startY == 1 && (startX == 3 || startX == 5))) {
-            if (upRightKill(game)) {
+            if (upRightKill(gameStatusModule)) {
                 return true;
             } else {
-                return (upLeftKill(game));
+                return (upLeftKill(gameStatusModule));
             }
         }
         return false;
     }
 
     @Override
-    public boolean killEnemyPiece(Game game) throws Exception {
-        Board board = game.board;
-        Player player = game.currentPlayer;
-        int startX = game.startX;
-        int startY = game.startY;
-        int endX = game.endX;
-        int endY = game.endY;
+    public boolean killEnemyPiece(GameStatusModule gameStatusModule) throws Exception {
+        Board board = gameStatusModule.getBoard();
+        Player player = gameStatusModule.getPlayer();
+        int startX = gameStatusModule.getStartSpot().getPoint().getX();
+        int startY = gameStatusModule.getStartSpot().getPoint().getY();
+        int endX = gameStatusModule.getEndSpot().getPoint().getX();
+        int endY = gameStatusModule.getEndSpot().getPoint().getY();
         if (player.isWhite()) {
             if (startX - 2 == endX && startY + 2 == endY && board.pieceIsBlack(startX - 1, startY + 1)) {
                 board.setBoardPieceNull(startX - 1, startY + 1);
@@ -314,7 +314,7 @@ public class RegularPiece extends Piece {
     }
 
     @Override
-    public List<String> possiblePrimaryMoves(Game game) {
+    public List<String> possiblePrimaryMoves(GameStatusModule gameStatusModule) {
         return new ArrayList<>();
     }
 }
