@@ -88,4 +88,8 @@ public class Spot {
             return board.getStartPiece(gameStatusModule).possiblePrimaryMoves(gameStatusModule).contains(String.valueOf(endX) + endY);
         }
     }
+
+    public void setX(int parseInt) {
+
+    }
 }

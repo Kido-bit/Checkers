@@ -83,6 +83,7 @@ public class Game {
     }
 
     public void newGame() {
+        gameStatusModule = new GameStatusModule();
         playerDao.reset();
         moveDao.reset();
         players = createPlayers();
@@ -94,6 +95,7 @@ public class Game {
 
         board = new Board();
         board.resetBoard();
+        gameStatusModule.setBoard(board);
 
         Player player1 = players.get(0);
         Player player2 = players.get(1);
@@ -122,6 +124,7 @@ public class Game {
 
         board = new Board();
         board.resetBoard();
+        gameStatusModule.setBoard(board);
 
         Player whitePlayer = players.get(0);
         Player blackPlayer = players.get(1);
@@ -204,6 +207,8 @@ public class Game {
     }
 
     public void getSpot(boolean isStartSpot) throws Exception {
+        Spot spot = new Spot();
+        gameStatusModule.setStartSpot(spot);
         String stringSpotXY;
         Point point;
         boolean isSpotValid;
@@ -220,6 +225,8 @@ public class Game {
             point = parseInputXY(stringSpotXY);
             int startX = point.getX();
             int startY = point.getY();
+            gameStatusModule.getStartSpot().getPoint().setX(startX);
+            gameStatusModule.getStartSpot().getPoint().setY(startY);
             if (isStartSpot) {
                 isSpotValid = Spot.validateStartSpot(gameStatusModule);
             } else {
